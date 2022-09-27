@@ -1,0 +1,45 @@
+{
+  "name": "mailhoo",
+  "version": "1.0.0",
+  "description": "Local SMTP Server and Mailbox",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yo1000/mailhoo.git"
+  },
+  "author": "yo1000",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yo1000/mailhoo/issues"
+  },
+  "homepage": "https://github.com/yo1000/mailhoo#readme",
+  "devDependencies": {
+    "@babel/core": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "@babel/preset-react": "^7.18.6",
+    "@emotion/babel-preset-css-prop": "^11.10.0",
+    "@svgr/webpack": "^6.3.1",
+    "babel-loader": "^8.2.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.0"
+  },
+  "dependencies": {
+    "@emotion/css": "^11.10.0",
+    "@emotion/react": "^11.10.4",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@primer/octicons-react": "^17.5.0",
+    "bootstrap": "^5.2.1",
+    "dompurify": "^2.4.0",
+    "react-bootstrap": "^2.5.0"
+  }
+}

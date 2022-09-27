@@ -1,0 +1,14 @@
+mailhoo:
+  port: 1025
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:mailhoo
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+server:
+  error:
+    whitelabel:
+      enabled: false
