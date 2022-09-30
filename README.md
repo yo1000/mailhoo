@@ -1,4 +1,4 @@
-Mailhoo
+<img src="https://raw.githubusercontent.com/yo1000/mailhoo/master/src/main/resources/node/src/components/mailhoo_logo.svg" width="32"> Mailhoo
 =======
 
 Mailhoo is a SMTP server for development inspired by [MailHog](https://github.com/mailhog/MailHog).
