@@ -48,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: mailhoo-${{ matrix.os }}
-          path: target/mailhoo
+          path: target
 
   container:
     if: contains(github.ref, 'refs/tags/')
