@@ -1,0 +1,9 @@
+FROM ubuntu:22.04
+
+ARG APP_LOCATION
+
+COPY $APP_LOCATION /opt/mailhoo
+
+EXPOSE 8080 1025
+
+ENTRYPOINT ["/opt/mailhoo"]
