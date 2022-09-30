@@ -9,8 +9,11 @@ on:
       - '*'
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  test:
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: graalvm/setup-graalvm@v1
@@ -19,11 +22,47 @@ jobs:
           java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
       - name: Build
         run: |
-          ./mvnw clean package -Pnative
-      - name: Upload binary
-        uses: actions/upload-artifact@v2
+          mvn clean test
+
+  package:
+    if: contains(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: '22.2.0'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - name: Build
+        run: |
+          mvn -Pnative -DskipTests clean package
+      - uses: actions/upload-artifact@v2
         with:
           name: mailhoo-${{ matrix.os }}
           path: target/mailhoo
+
+  container:
+    if: contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: mailhoo-ubuntu-latest
+          path: target/mailhoo
+      - name: Build
+        run: |
+          chmod +x target/mailhoo
+          VERSION=$(echo '${{ github.ref }}' | sed -e 's/refs\/tags\///g' | sed -e 's/refs\/heads\///g')
+          
+          docker build -t yo1000/mailhoo:$VERSION --build-arg APP_LOCATION=target/mailhoo .
+          docker image ls
