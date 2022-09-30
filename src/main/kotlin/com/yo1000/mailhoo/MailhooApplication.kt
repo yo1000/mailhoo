@@ -1,7 +1,5 @@
 package com.yo1000.mailhoo
 
-import com.sun.mail.handlers.*
-import com.sun.mail.smtp.SMTPTransport
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.JpaRepository
@@ -14,10 +12,18 @@ import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeAccess
 import org.springframework.nativex.hint.TypeHint
 import java.util.*
-import javax.activation.MailcapCommandMap
-import javax.mail.internet.MimeMultipart
 
-@NativeHint(options = ["-H:+AddAllCharsets"])
+@NativeHint(options = [
+	"-H:+AddAllCharsets",
+	"-H:IncludeResources=META-INF/mailcap",
+	"-H:IncludeResources=META-INF/mailcap.default",
+	"-H:IncludeResources=META-INF/mimetypes.default",
+	"-H:IncludeResources=META-INF/javamail.default.address.map",
+	"-H:IncludeResources=META-INF/javamail.charset.map",
+	"-H:IncludeResources=META-INF/javamail.default.providers",
+	"-H:IncludeResources=META-INF/services/javax.mail.Provider",
+	"-H:ReflectionConfigurationFiles=classes/reflectconfig.json",
+])
 @TypeHint(
 	types = [
 		JpaRepository::class,
@@ -28,17 +34,6 @@ import javax.mail.internet.MimeMultipart
 		Optional::class,
 		FluentQuery::class,
 		FluentQuery.FetchableFluentQuery::class,
-		SMTPTransport::class,
-		MimeMultipart::class,
-		MailcapCommandMap::class,
-		text_html::class,
-		multipart_mixed::class,
-		handler_base::class,
-		image_gif::class,
-		image_jpeg::class,
-		message_rfc822::class,
-		text_xml::class,
-		text_plain::class
 	],
 	access = [TypeAccess.QUERY_PUBLIC_METHODS]
 )
