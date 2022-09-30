@@ -3,9 +3,10 @@
 
 Mailhoo is a SMTP server for development inspired by [MailHog](https://github.com/mailhog/MailHog).
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)<br>
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)<br>
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)<br>
+![GitHub Actions](https://github.com/yo1000/mailhoo/actions/workflows/mailhoo.yml/badge.svg)<br>
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 
 
