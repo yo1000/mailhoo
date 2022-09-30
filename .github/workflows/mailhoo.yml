@@ -1,0 +1,29 @@
+name: Mailhoo
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: '22.2.0'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        run: |
+          ./mvnw clean package -Pnative
+      - name: Upload binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: mailhoo-${{ matrix.os }}
+          path: target/mailhoo
