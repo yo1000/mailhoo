@@ -69,3 +69,60 @@ for Development.
   -Dserver.error.whitelabel.enabled=true
 "
 ```
+
+
+### Multi database support
+
+Standard supports are follows.
+
+- H2 (default, in-memory mode)
+- PostgreSQL
+- MySQL
+- MariaDB
+
+for example: Using PostgreSQL.
+
+```shell
+docker run -d -p5432:5432 \
+-ePOSTGRES_DB=postgres \
+-ePOSTGRES_USER=postgres \
+-ePOSTGRES_PASSWORD=postgres \
+postgres:latest
+
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postgres
+export SPRING_DATASOURCE_USERNAME=postgres
+export SPRING_DATASOURCE_PASSWORD=postgres
+./target/mailhoo
+```
+
+for example: Using MySQL.
+
+```shell
+docker run -d -p3306:3306 \
+-eMYSQL_DATABASE=my \
+-eMYSQL_USER=my \
+-eMYSQL_PASSWORD=my \
+-eMYSQL_ROOT_PASSWORD=my \
+mysql:latest
+
+export SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/my
+export SPRING_DATASOURCE_USERNAME=my
+export SPRING_DATASOURCE_PASSWORD=my
+./target/mailhoo
+```
+
+for example: Using MariaDB.
+
+```shell
+docker run -d -p3306:3306 \
+-eMARIADB_DATABASE=maria \
+-eMARIADB_USER=maria \
+-eMARIADB_PASSWORD=maria \
+-eMARIADB_ROOT_PASSWORD=maria \
+mariadb:latest
+
+export SPRING_DATASOURCE_URL=jdbc:mariadb://localhost:3306/maria
+export SPRING_DATASOURCE_USERNAME=maria
+export SPRING_DATASOURCE_PASSWORD=maria
+./target/mailhoo
+```

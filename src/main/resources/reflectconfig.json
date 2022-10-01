@@ -26,5 +26,11 @@
   {
     "name" : "com.sun.mail.handlers.text_xml",
     "methods" : [{ "name" : "<init>", "parameterTypes" : [] }]
+  },
+  {
+    "name" : "org.hibernate.internal.log.ConnectionAccessLogger_$logger",
+    "methods" : [{ "name" : "<init>", "parameterTypes" : [
+      "org.jboss.logging.Logger"
+    ] }]
   }
 ]

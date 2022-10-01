@@ -1,5 +1,6 @@
 package com.yo1000.mailhoo
 
+import org.hibernate.internal.log.`ConnectionAccessLogger_$logger`
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.JpaRepository
@@ -34,6 +35,7 @@ import java.util.*
 		Optional::class,
 		FluentQuery::class,
 		FluentQuery.FetchableFluentQuery::class,
+		`ConnectionAccessLogger_$logger`::class,
 	],
 	access = [TypeAccess.QUERY_PUBLIC_METHODS]
 )
