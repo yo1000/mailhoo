@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.ExampleMatcher
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.subethamail.wiser.Wiser
 import org.subethamail.wiser.WiserMessage
 import java.io.ByteArrayOutputStream
