@@ -67,7 +67,16 @@ for Development.
   -Dspring.jpa.show-sql=true
   -Dspring.h2.console.enabled=true
   -Dserver.error.whitelabel.enabled=true
-"
+  -Dmailhoo.web.allowed-origins=http://localhost:8081
+" &
+
+cd src/main/resources/node
+NODE_ENV=development \
+PORT=8081 \
+API_BASE_URL=http://localhost:8080 \
+npx webpack serve &
+
+open http://localhost:8081
 ```
 
 

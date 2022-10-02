@@ -27,7 +27,6 @@ typealias RecipientType = javax.mail.Message.RecipientType
  * @author yo1000
  */
 @Configuration
-@EnableJpaRepositories
 @EnableConfigurationProperties(SmtpConfigurationProperties::class)
 class SmtpConfig(
     private val props: SmtpConfigurationProperties
@@ -187,7 +186,7 @@ class SmtpConfig(
     }
 }
 
-@ConfigurationProperties(prefix = "mailhoo")
+@ConfigurationProperties(prefix = "mailhoo.smtp")
 class SmtpConfigurationProperties(
     var port: Int?
 )

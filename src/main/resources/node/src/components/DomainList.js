@@ -44,6 +44,8 @@ export default function DomainList({
     }
   `
 
+  const API_BAE_URL = process.env.API_BASE_URL
+
   const [getFromDomains, setFromDomains] = fromDomainsState
   const [getToDomains, setToDomains] = toDomainsState
   const [getCcDomains, setCcDomains] = ccDomainsState
@@ -62,7 +64,7 @@ export default function DomainList({
   const [getViewCondition, setViewCondition] = viewConditionState
 
   const updateMessages = () => {
-    fetch('/messages')
+    fetch(`${API_BAE_URL}/messages`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ list: 'all' })
@@ -72,7 +74,7 @@ export default function DomainList({
   }
 
   const updateMessagesByFromDomain = (domainName) => {
-    fetch(`/messages?fromDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByFromDomain: domainName })
@@ -82,7 +84,7 @@ export default function DomainList({
   }
 
   const updateMessagesByToDomain = (domainName) => {
-    fetch(`/messages?toDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByToDomain: domainName })
@@ -92,7 +94,7 @@ export default function DomainList({
   }
 
   const updateMessagesByCcDomain = (domainName) => {
-    fetch(`/messages?ccDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByCcDomain: domainName })
@@ -102,7 +104,7 @@ export default function DomainList({
   }
 
   const updateMessagesByBccDomain = (domainName) => {
-    fetch(`/messages?bccDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByBccDomain: domainName })

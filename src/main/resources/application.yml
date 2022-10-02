@@ -1,5 +1,6 @@
 mailhoo:
-  port: 1025
+  smtp.port: 1025
+  web.allowed-origins:
 
 spring:
   datasource:

@@ -1,4 +1,4 @@
-const debug = process.env.NODE_ENV !== 'production'
+const debug = process.env.NODE_ENV === 'development'
 const webpack = require('webpack')
 const path = require('path')
 
@@ -29,8 +29,22 @@ module.exports = {
       use: ['@svgr/webpack', 'url-loader']
     }]
   },
-  plugins: debug ? [] : [
+  plugins: [
+    new webpack.EnvironmentPlugin({
+      API_BASE_URL: ""
+    }),
+  ].concat(debug ? [] : [
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
-  ]
+    new webpack.optimize.UglifyJsPlugin({
+      mangle: false,
+      sourcemap: false
+    }),
+  ]),
+  devServer: {
+    static: {
+      directory: path.join(__dirname, '../public'),
+    },
+    allowedHosts: 'all',
+    port: process.env.PORT ? process.env.PORT : 'auto',
+  },
 }

@@ -72,6 +72,8 @@ function Layout() {
     }
   `
 
+  const API_BAE_URL = process.env.API_BASE_URL
+
   const [getInitialized, setInitialized] = useState()
 
   const fromDomainsState = useState()
@@ -104,31 +106,31 @@ function Layout() {
   const [getViewCondition, setViewCondition] = viewConditionState
 
   const updateFromDomains = () => {
-    fetch('/domains/from')
+    fetch(`${API_BAE_URL}/domains/from`)
       .then(resp => resp.json())
       .then(domains => setFromDomains(domains))
   }
 
   const updateToDomains = () => {
-    fetch('/domains/to')
+    fetch(`${API_BAE_URL}/domains/to`)
       .then(resp => resp.json())
       .then(domains => setToDomains(domains))
   }
 
   const updateCcDomains = () => {
-    fetch('/domains/cc')
+    fetch(`${API_BAE_URL}/domains/cc`)
       .then(resp => resp.json())
       .then(domains => setCcDomains(domains))
   }
 
   const updateBccDomains = () => {
-    fetch('/domains/bcc')
+    fetch(`${API_BAE_URL}/domains/bcc`)
       .then(resp => resp.json())
       .then(domains => setBccDomains(domains))
   }
 
   const updateMessages = () => {
-    fetch('/messages')
+    fetch(`${API_BAE_URL}/messages`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ list: 'all' })
@@ -138,7 +140,7 @@ function Layout() {
   }
 
   const updateMessagesByFromDomain = (domainName) => {
-    fetch(`/messages?fromDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByFromDomain: domainName })
@@ -148,7 +150,7 @@ function Layout() {
   }
 
   const updateMessagesByToDomain = (domainName) => {
-    fetch(`/messages?toDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByToDomain: domainName })
@@ -158,7 +160,7 @@ function Layout() {
   }
 
   const updateMessagesByCcDomain = (domainName) => {
-    fetch(`/messages?ccDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByCcDomain: domainName })
@@ -168,7 +170,7 @@ function Layout() {
   }
 
   const updateMessagesByBccDomain = (domainName) => {
-    fetch(`/messages?bccDomain=${domainName}`)
+    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByBccDomain: domainName })
@@ -178,7 +180,7 @@ function Layout() {
   }
 
   const updateMessagesBySearchQuery = (searchQuery) => {
-    fetch(`/messages/search?q=${searchQuery}`)
+    fetch(`${API_BAE_URL}/messages/search?q=${searchQuery}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listBySearchQuery: searchQuery })

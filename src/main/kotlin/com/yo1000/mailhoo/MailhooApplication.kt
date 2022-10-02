@@ -4,6 +4,7 @@ import org.hibernate.internal.log.`ConnectionAccessLogger_$logger`
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.Repository
@@ -40,6 +41,7 @@ import java.util.*
 	access = [TypeAccess.QUERY_PUBLIC_METHODS]
 )
 @SpringBootApplication
+@EnableJpaRepositories
 class MailhooApplication
 
 fun main(args: Array<String>) {
