@@ -63,7 +63,7 @@ for Production by GraalVM based native binary.
 for Development.
 
 ```shell
-./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="
+./mvnw clean spring-boot:run -Dspring-boot.run.jvmArguments="
   -Dspring.jpa.show-sql=true
   -Dspring.h2.console.enabled=true
   -Dserver.error.whitelabel.enabled=true

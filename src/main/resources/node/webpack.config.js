@@ -1,6 +1,7 @@
 const debug = process.env.NODE_ENV === 'development'
 const webpack = require('webpack')
 const path = require('path')
+const TerserPlugin = require("terser-webpack-plugin")
 
 module.exports = {
   entry: {
@@ -29,17 +30,16 @@ module.exports = {
       use: ['@svgr/webpack', 'url-loader']
     }]
   },
+  optimization: debug ? {} : {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+    moduleIds: 'named',
+  },
   plugins: [
     new webpack.EnvironmentPlugin({
       API_BASE_URL: ""
     }),
-  ].concat(debug ? [] : [
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      mangle: false,
-      sourcemap: false
-    }),
-  ]),
+  ],
   devServer: {
     static: {
       directory: path.join(__dirname, '../public'),
