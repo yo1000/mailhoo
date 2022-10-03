@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import {css} from "@emotion/react";
 import {Row, Col, Stack, Form, Button} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faRotateRight, faArrowLeft, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {MarkGithubIcon} from '@primer/octicons-react'
 
 import DomainList from "./components/DomainList";
@@ -129,8 +129,8 @@ function Layout() {
       .then(domains => setBccDomains(domains))
   }
 
-  const updateMessages = () => {
-    fetch(`${API_BAE_URL}/messages`)
+  const updateMessages = (page) => {
+    fetch(`${API_BAE_URL}/messages${page ? `?page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ list: 'all' })
@@ -139,8 +139,8 @@ function Layout() {
       })
   }
 
-  const updateMessagesByFromDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}`)
+  const updateMessagesByFromDomain = (domainName, page) => {
+    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}${page ? `&page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByFromDomain: domainName })
@@ -149,8 +149,8 @@ function Layout() {
       })
   }
 
-  const updateMessagesByToDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}`)
+  const updateMessagesByToDomain = (domainName, page) => {
+    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}${page ? `&page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByToDomain: domainName })
@@ -159,8 +159,8 @@ function Layout() {
       })
   }
 
-  const updateMessagesByCcDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}`)
+  const updateMessagesByCcDomain = (domainName, page) => {
+    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}${page ? `&page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByCcDomain: domainName })
@@ -169,8 +169,8 @@ function Layout() {
       })
   }
 
-  const updateMessagesByBccDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}`)
+  const updateMessagesByBccDomain = (domainName, page) => {
+    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}${page ? `&page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listByBccDomain: domainName })
@@ -179,8 +179,8 @@ function Layout() {
       })
   }
 
-  const updateMessagesBySearchQuery = (searchQuery) => {
-    fetch(`${API_BAE_URL}/messages/search?q=${searchQuery}`)
+  const updateMessagesBySearchQuery = (searchQuery, page) => {
+    fetch(`${API_BAE_URL}/messages/search?q=${searchQuery}${page ? `&page=${page}` : ''}`)
       .then(resp => resp.json())
       .then(messages => {
         setViewCondition({ listBySearchQuery: searchQuery })
@@ -190,24 +190,24 @@ function Layout() {
       })
   }
 
-  const reload = () => {
+  const reload = (page) => {
     updateFromDomains()
     updateToDomains()
     updateCcDomains()
     updateBccDomains()
 
     if (getViewCondition && getViewCondition.listBySearchQuery) {
-      updateMessagesBySearchQuery(getViewCondition.listBySearchQuery)
+      updateMessagesBySearchQuery(getViewCondition.listBySearchQuery, page)
     } else if (getViewCondition && getViewCondition.listByFromDomain) {
-      updateMessagesByFromDomain(getViewCondition.listByFromDomain)
+      updateMessagesByFromDomain(getViewCondition.listByFromDomain, page)
     } else if (getViewCondition && getViewCondition.listByToDomain) {
-      updateMessagesByToDomain(getViewCondition.listByToDomain)
+      updateMessagesByToDomain(getViewCondition.listByToDomain, page)
     } else if (getViewCondition && getViewCondition.listByCcDomain) {
-      updateMessagesByCcDomain(getViewCondition.listByCcDomain)
+      updateMessagesByCcDomain(getViewCondition.listByCcDomain, page)
     } else if (getViewCondition && getViewCondition.listByBccDomain) {
-      updateMessagesByBccDomain(getViewCondition.listByBccDomain)
+      updateMessagesByBccDomain(getViewCondition.listByBccDomain, page)
     } else {
-      updateMessages()
+      updateMessages(page)
     }
   }
 
@@ -277,15 +277,9 @@ function Layout() {
             <Row>
               <Col sm={12} className="messageTableContainer">
                 {
-                  getMessageDetails ? (<>
-                    <Button variant="outline-secondary" onClick={() => {
-                      setMessageDetails(null)
-                      reload()
-                    }}>
-                      <FontAwesomeIcon icon={faArrowLeft}/> Back
-                    </Button>
+                  getMessageDetails ? (
                     <MessageDetails messageDetailsState={messageDetailsState}/>
-                  </>) :
+                  ) :
                   /*
                    * { list: 'all' }
                    * { listBySearchQuery: ... }
@@ -299,14 +293,11 @@ function Layout() {
                   || getViewCondition.listByFromDomain
                   || getViewCondition.listByToDomain
                   || getViewCondition.listByCcDomain
-                  || getViewCondition.listByBccDomain) ? (<>
-                    <Button variant="outline-secondary" onClick={reload}>
-                      <FontAwesomeIcon icon={faRotateRight}/> Reload
-                    </Button>
+                  || getViewCondition.listByBccDomain) ? (
                     <MessageTable messagesState={messagesState}
-                                  messageDetailsState={messageDetailsState}/>
-                  </>) :
-                  <></>
+                                  messageDetailsState={messageDetailsState}
+                                  viewConditionState={viewConditionState}/>
+                    ) : <></>
                 }
               </Col>
             </Row>

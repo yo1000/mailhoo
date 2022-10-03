@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import {css} from "@emotion/react";
-import {Row, Col, ButtonGroup, ToggleButton} from "react-bootstrap";
+import {Row, Col, ButtonGroup, ToggleButton, Button} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFileArrowDown} from '@fortawesome/free-solid-svg-icons'
+import {faArrowLeft, faFileArrowDown} from '@fortawesome/free-solid-svg-icons'
 import dompurify from 'dompurify'
 
 import colors from "../colors"
@@ -118,6 +118,12 @@ export default function MessageDetails({
   const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value);
 
   return (<>
+    <Button variant="outline-secondary" onClick={() => {
+      setMessageDetails(null)
+    }}>
+      <FontAwesomeIcon icon={faArrowLeft}/> Back
+    </Button>
+
     <div css={style}>
       <h2>{getMessageDetails.subject}</h2>
       <Row>
