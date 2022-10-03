@@ -7,9 +7,13 @@ import dompurify from 'dompurify'
 
 import colors from "../colors"
 
-export default function MessageDetails({
-  messageDetailsState
-}) {
+/**
+ *
+ * @param {ViewState} viewState
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function MessageDetails({viewState}) {
   const style = css`
     h2 {
       font-size: 1.5rem;
@@ -114,18 +118,17 @@ export default function MessageDetails({
     { name: 'Headers', value: '3' },
   ]
 
-  const [getMessageDetails, setMessageDetails] = messageDetailsState
   const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value);
 
   return (<>
     <Button variant="outline-secondary" onClick={() => {
-      setMessageDetails(null)
+      viewState.setMessageDetails(null)
     }}>
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
     <div css={style}>
-      <h2>{getMessageDetails.subject}</h2>
+      <h2>{viewState.messageDetails.subject}</h2>
       <Row>
         <Col sm={8}>
           <table className="addresses">
@@ -133,7 +136,7 @@ export default function MessageDetails({
             <tr>
               <th>From:</th>
               <td><ul>{
-                getMessageDetails.sentFrom.map(item => item.address.displayName
+                viewState.messageDetails.sentFrom.map(item => item.address.displayName
                   ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
                   : (<li><b>{item.address.email}</b></li>)
                 )
@@ -142,7 +145,7 @@ export default function MessageDetails({
             <tr>
               <th>To:</th>
               <td><ul>{
-                getMessageDetails.receivedTo.map(item => item.address.displayName
+                viewState.messageDetails.receivedTo.map(item => item.address.displayName
                   ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
                   : (<li><b>{item.address.email}</b></li>)
                 )
@@ -151,7 +154,7 @@ export default function MessageDetails({
             <tr>
               <th>Cc:</th>
               <td><ul>{
-                getMessageDetails.receivedCc.map(item => item.address.displayName
+                viewState.messageDetails.receivedCc.map(item => item.address.displayName
                   ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
                   : (<li><b>{item.address.email}</b></li>)
                 )
@@ -160,7 +163,7 @@ export default function MessageDetails({
             <tr>
               <th>Bcc:</th>
               <td><ul>{
-                getMessageDetails.receivedBcc.map(item => item.address.displayName
+                viewState.messageDetails.receivedBcc.map(item => item.address.displayName
                   ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
                   : (<li><b>{item.address.email}</b></li>)
                 )
@@ -175,13 +178,13 @@ export default function MessageDetails({
             <tr>
               <th>Sent:</th>
               <td>
-                <DetailsLocalDateTime dateTime={getMessageDetails.sentDate}/>
+                <DetailsLocalDateTime dateTime={viewState.messageDetails.sentDate}/>
               </td>
             </tr>
             <tr>
               <th>Received:</th>
               <td>
-                <DetailsLocalDateTime dateTime={getMessageDetails.receivedDate}/>
+                <DetailsLocalDateTime dateTime={viewState.messageDetails.receivedDate}/>
               </td>
             </tr>
             </tbody>
@@ -189,10 +192,10 @@ export default function MessageDetails({
         </Col>
       </Row>
 
-      {getMessageDetails.attachments && getMessageDetails.attachments.length ? (
+      {viewState.messageDetails.attachments && viewState.messageDetails.attachments.length ? (
         <ul className="attachments">
-          {getMessageDetails.attachments.map(item => (
-            <li><a href={`/messages/${getMessageDetails.id}/attachments/${item.fileName}`}>
+          {viewState.messageDetails.attachments.map(item => (
+            <li><a href={`${viewState.API_BASE_URL}/messages/${viewState.messageDetails.id}/attachments/${item.fileName}`}>
               <FontAwesomeIcon icon={faFileArrowDown}/>
               {item.fileName}
             </a></li>
@@ -220,15 +223,15 @@ export default function MessageDetails({
     <div>
     {
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value
-        ? (<p>{getMessageDetails.plainContent}</p>) :
+        ? (<p>{viewState.messageDetails.plainContent}</p>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value
         ? (<div dangerouslySetInnerHTML={{__html: dompurify
-            .sanitize(getMessageDetails.htmlContent)
+            .sanitize(viewState.messageDetails.htmlContent)
             .replace(/href/g, "target='_blank' rel='noopener noreferrer' href")
             .replace(/target=["']?[a-zA-Z_]*["']?/g, "target='_blank'")
         }}/>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HEADERS].value
-        ? (<code css={styleHeaders}><pre>{getMessageDetails.headers}</pre></code>)
+        ? (<code css={styleHeaders}><pre>{viewState.messageDetails.headers}</pre></code>)
         : (<></>)
     }
     </div>

@@ -3,15 +3,13 @@ import {css} from "@emotion/react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faInbox, faAt} from '@fortawesome/free-solid-svg-icons'
 
-export default function DomainList({
-  fromDomainsState,
-  toDomainsState,
-  ccDomainsState,
-  bccDomainsState,
-  messagesState,
-  messageDetailsState,
-  viewConditionState,
-}) {
+/**
+ *
+ * @param {ViewState} viewState
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function DomainList({viewState}) {
   const style = css`
     h3 {
       margin-bottom: .75rem;
@@ -44,88 +42,12 @@ export default function DomainList({
     }
   `
 
-  const API_BAE_URL = process.env.API_BASE_URL
-
-  const [getFromDomains, setFromDomains] = fromDomainsState
-  const [getToDomains, setToDomains] = toDomainsState
-  const [getCcDomains, setCcDomains] = ccDomainsState
-  const [getBccDomains, setBccDomains] = bccDomainsState
-  const [getMessages, setMessages] = messagesState
-  const [getMessageDetails, setMessageDetails] = messageDetailsState
-
-  /**
-   * { list: 'all' }
-   * { listBySearchQuery: ... }
-   * { listByFromDomain: ... }
-   * { listByToDomain: ... }
-   * { listByCcDomain: ... }
-   * { listByBccDomain: ... }
-   */
-  const [getViewCondition, setViewCondition] = viewConditionState
-
-  const updateMessages = () => {
-    fetch(`${API_BAE_URL}/messages`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ list: 'all' })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByFromDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByFromDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByToDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByToDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByCcDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByCcDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByBccDomain = (domainName) => {
-    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByBccDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const activateDomainFilterStyle = (event) => {
-    document.querySelectorAll('.active').forEach(elm => {
-      elm.classList.remove('active')
-    })
-    event.target.classList.add('active')
-  }
-
   return (
     <div css={style}>
       <ul>
         <li className="active" onClick={(event) => {
-          updateMessages()
-          activateDomainFilterStyle(event)
+          viewState.updateMessages()
+          viewState.activateDomainFilterStyle(event)
         }}>
           <FontAwesomeIcon icon={faInbox}/>
           Inbox
@@ -134,10 +56,10 @@ export default function DomainList({
       <h3>From</h3>
       <ul>
         {
-          getFromDomains && getFromDomains.map(d => (
+          viewState.fromDomains && viewState.fromDomains.map(d => (
             <li onClick={(event) => {
-              updateMessagesByFromDomain(d)
-              activateDomainFilterStyle(event)
+              viewState.updateMessagesByFromDomain(d)
+              viewState.activateDomainFilterStyle(event)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -148,10 +70,10 @@ export default function DomainList({
       <h3>To</h3>
       <ul>
         {
-          getToDomains && getToDomains.map(d => (
+          viewState.toDomains && viewState.toDomains.map(d => (
             <li onClick={(event) => {
-              updateMessagesByToDomain(d)
-              activateDomainFilterStyle(event)
+              viewState.updateMessagesByToDomain(d)
+              viewState.activateDomainFilterStyle(event)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -162,10 +84,10 @@ export default function DomainList({
       <h3>Cc</h3>
       <ul>
         {
-          getCcDomains && getCcDomains.map(d => (
+          viewState.ccDomains && viewState.ccDomains.map(d => (
             <li onClick={(event) => {
-              updateMessagesByCcDomain(d)
-              activateDomainFilterStyle(event)
+              viewState.updateMessagesByCcDomain(d)
+              viewState.activateDomainFilterStyle(event)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -176,10 +98,10 @@ export default function DomainList({
       <h3>Bcc</h3>
       <ul>
         {
-          getBccDomains && getBccDomains.map(d => (
+          viewState.bccDomains && viewState.bccDomains.map(d => (
             <li onClick={(event) => {
-              updateMessagesByBccDomain(d)
-              activateDomainFilterStyle(event)
+              viewState.updateMessagesByBccDomain(d)
+              viewState.activateDomainFilterStyle(event)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}

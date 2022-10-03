@@ -6,11 +6,13 @@ import {faAngleRight, faFile, faRotateRight} from '@fortawesome/free-solid-svg-i
 
 import colors from '../colors'
 
-export default function MessageTable({
-  messagesState,
-  messageDetailsState,
-  viewConditionState,
-}) {
+/**
+ *
+ * @param {ViewState} viewState
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function MessageTable({viewState}) {
   const style = css`
     .header {
       margin: 0 0 1.5rem;
@@ -98,102 +100,6 @@ export default function MessageTable({
     }
   `
 
-  const API_BAE_URL = process.env.API_BASE_URL
-
-  const [getMessages, setMessages] = messagesState
-  const [getMessageDetails, setMessageDetails] = messageDetailsState
-
-  /**
-   * { list: 'all' }
-   * { listBySearchQuery: ... }
-   * { listByFromDomain: ... }
-   * { listByToDomain: ... }
-   * { listByCcDomain: ... }
-   * { listByBccDomain: ... }
-   */
-  const [getViewCondition, setViewCondition] = viewConditionState
-
-  const updateMessages = (page) => {
-    fetch(`${API_BAE_URL}/messages${page ? `?page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ list: 'all' })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByFromDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByFromDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByToDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByToDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByCcDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByCcDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByBccDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByBccDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesBySearchQuery = (searchQuery, page) => {
-    fetch(`${API_BAE_URL}/messages/search?q=${searchQuery}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listBySearchQuery: searchQuery })
-        setMessages(messages)
-        setMessageDetails(null)
-        deactivateDomainFilterStyle()
-      })
-  }
-
-  const reload = (page) => {
-    if (getViewCondition && getViewCondition.listBySearchQuery) {
-      updateMessagesBySearchQuery(getViewCondition.listBySearchQuery, page)
-    } else if (getViewCondition && getViewCondition.listByFromDomain) {
-      updateMessagesByFromDomain(getViewCondition.listByFromDomain, page)
-    } else if (getViewCondition && getViewCondition.listByToDomain) {
-      updateMessagesByToDomain(getViewCondition.listByToDomain, page)
-    } else if (getViewCondition && getViewCondition.listByCcDomain) {
-      updateMessagesByCcDomain(getViewCondition.listByCcDomain, page)
-    } else if (getViewCondition && getViewCondition.listByBccDomain) {
-      updateMessagesByBccDomain(getViewCondition.listByBccDomain, page)
-    } else {
-      updateMessages(page)
-    }
-  }
-
-  const chooseMessage = (message) => {
-    setMessageDetails(message)
-  }
-
   const createPaginatorIndexes = (currentPage, totalPages) => {
     const start =
       totalPages < 10 ? 0 :
@@ -219,39 +125,39 @@ export default function MessageTable({
       <div className="header">
         <Row>
           <Col className="reload">
-            <Button variant="outline-secondary" onClick={() => {reload(getMessages.number)}}>
+            <Button variant="outline-secondary" onClick={() => viewState.reload()}>
               <FontAwesomeIcon icon={faRotateRight}/> Reload
             </Button>
           </Col>
           <Col className="paginator">
             {
-              getMessages && getMessages.totalPages && (
+              viewState.pagedMessages && viewState.pagedMessages.totalPages && (
                 <ButtonToolbar>
                   {
-                    (getMessages.totalPages >= 14) && (getMessages.number > 4) && (
+                    (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number > 4) && (
                       <ButtonGroup className="me-2">
                         <Button variant="outline-secondary" onClick={
-                          () => reload(0)
+                          () => viewState.reload(0)
                         }>{1}</Button>
                       </ButtonGroup>
                     )
                   }
                   <ButtonGroup className="me-2">
                     {
-                      createPaginatorIndexes(getMessages.number, getMessages.totalPages).map(i => (
+                      createPaginatorIndexes(viewState.pagedMessages.number, viewState.pagedMessages.totalPages).map(i => (
                         <Button variant="outline-secondary"
-                                className={i === getMessages.number && 'active'} onClick={
-                          () => reload(i)
+                                className={i === viewState.pagedMessages.number && 'active'} onClick={
+                          () => viewState.reload(i)
                         }>{i + 1}</Button>
                       ))
                     }
                   </ButtonGroup>
                   {
-                    (getMessages.totalPages >= 14) && (getMessages.number + 5 < getMessages.totalPages) && (
+                    (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number + 5 < viewState.pagedMessages.totalPages) && (
                       <ButtonGroup className="me-2">
                         <Button variant="outline-secondary" onClick={
-                          () => reload(getMessages.totalPages - 1)
-                        }>{getMessages.totalPages}</Button>
+                          () => viewState.reload(viewState.pagedMessages.totalPages - 1)
+                        }>{viewState.pagedMessages.totalPages}</Button>
                       </ButtonGroup>
                     )
                   }
@@ -264,8 +170,8 @@ export default function MessageTable({
 
       <div className="messages">
         {
-          getMessages && getMessages.content && getMessages.content.map(m => (
-            <Row className="row" onClick={() => chooseMessage(m)}>
+          viewState.pagedMessages && viewState.pagedMessages.content && viewState.pagedMessages.content.map(m => (
+            <Row className="row" onClick={() => viewState.chooseMessage(m)}>
               <Col className="email">
                 <ItemEmail sentFrom={m.sentFrom}
                            receivedTo={m.receivedTo}

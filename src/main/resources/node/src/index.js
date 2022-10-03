@@ -10,6 +10,7 @@ import DomainList from "./components/DomainList";
 import MessageTable from "./components/MessageTable"
 import MessageDetails from "./components/MessageDetails"
 import Logo from "./components/Logo"
+import ViewState from "./ViewState";
 import colors from "./colors"
 
 function Layout() {
@@ -72,144 +73,7 @@ function Layout() {
     }
   `
 
-  const API_BAE_URL = process.env.API_BASE_URL
-
-  const [getInitialized, setInitialized] = useState()
-
-  const fromDomainsState = useState()
-  const [getFromDomains, setFromDomains] = fromDomainsState
-
-  const toDomainsState = useState()
-  const [getToDomains, setToDomains] = toDomainsState
-
-  const ccDomainsState = useState()
-  const [getCcDomains, setCcDomains] = ccDomainsState
-
-  const bccDomainsState = useState()
-  const [getBccDomains, setBccDomains] = bccDomainsState
-
-  const messagesState = useState()
-  const [getMessages, setMessages] = messagesState
-
-  const messageDetailsState = useState()
-  const [getMessageDetails, setMessageDetails] = messageDetailsState
-
-  /**
-   * { list: 'all' }
-   * { listBySearchQuery: ... }
-   * { listByFromDomain: ... }
-   * { listByToDomain: ... }
-   * { listByCcDomain: ... }
-   * { listByBccDomain: ... }
-   */
-  const viewConditionState = useState()
-  const [getViewCondition, setViewCondition] = viewConditionState
-
-  const updateFromDomains = () => {
-    fetch(`${API_BAE_URL}/domains/from`)
-      .then(resp => resp.json())
-      .then(domains => setFromDomains(domains))
-  }
-
-  const updateToDomains = () => {
-    fetch(`${API_BAE_URL}/domains/to`)
-      .then(resp => resp.json())
-      .then(domains => setToDomains(domains))
-  }
-
-  const updateCcDomains = () => {
-    fetch(`${API_BAE_URL}/domains/cc`)
-      .then(resp => resp.json())
-      .then(domains => setCcDomains(domains))
-  }
-
-  const updateBccDomains = () => {
-    fetch(`${API_BAE_URL}/domains/bcc`)
-      .then(resp => resp.json())
-      .then(domains => setBccDomains(domains))
-  }
-
-  const updateMessages = (page) => {
-    fetch(`${API_BAE_URL}/messages${page ? `?page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ list: 'all' })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByFromDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?fromDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByFromDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByToDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?toDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByToDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByCcDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?ccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByCcDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesByBccDomain = (domainName, page) => {
-    fetch(`${API_BAE_URL}/messages?bccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listByBccDomain: domainName })
-        setMessages(messages)
-        setMessageDetails(null)
-      })
-  }
-
-  const updateMessagesBySearchQuery = (searchQuery, page) => {
-    fetch(`${API_BAE_URL}/messages/search?q=${searchQuery}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        setViewCondition({ listBySearchQuery: searchQuery })
-        setMessages(messages)
-        setMessageDetails(null)
-        deactivateDomainFilterStyle()
-      })
-  }
-
-  const reload = (page) => {
-    updateFromDomains()
-    updateToDomains()
-    updateCcDomains()
-    updateBccDomains()
-
-    if (getViewCondition && getViewCondition.listBySearchQuery) {
-      updateMessagesBySearchQuery(getViewCondition.listBySearchQuery, page)
-    } else if (getViewCondition && getViewCondition.listByFromDomain) {
-      updateMessagesByFromDomain(getViewCondition.listByFromDomain, page)
-    } else if (getViewCondition && getViewCondition.listByToDomain) {
-      updateMessagesByToDomain(getViewCondition.listByToDomain, page)
-    } else if (getViewCondition && getViewCondition.listByCcDomain) {
-      updateMessagesByCcDomain(getViewCondition.listByCcDomain, page)
-    } else if (getViewCondition && getViewCondition.listByBccDomain) {
-      updateMessagesByBccDomain(getViewCondition.listByBccDomain, page)
-    } else {
-      updateMessages(page)
-    }
-  }
+  const viewState = new ViewState()
 
   const focusSearch = () => {
     document.querySelectorAll('.search form').forEach(elm => {
@@ -226,16 +90,10 @@ function Layout() {
     })
   }
 
-  const deactivateDomainFilterStyle = () => {
-    document.querySelectorAll('.active').forEach(elm => {
-      elm.classList.remove('active')
-    })
-  }
-
   useEffect(() => {
-    if (!getInitialized) {
-      reload()
-      setInitialized(true)
+    if (!viewState.initialized) {
+      viewState.reload()
+      viewState.setInitialized(true)
     }
   })
 
@@ -244,13 +102,7 @@ function Layout() {
       <Row>
         <Col sm={2}>
           <Logo/>
-          <DomainList fromDomainsState={fromDomainsState}
-                      toDomainsState={toDomainsState}
-                      ccDomainsState={ccDomainsState}
-                      bccDomainsState={bccDomainsState}
-                      messagesState={messagesState}
-                      messageDetailsState={messageDetailsState}
-                      viewConditionState={viewConditionState}/>
+          <DomainList viewState={viewState}/>
         </Col>
         <Col sm={10}>
           <Stack>
@@ -259,7 +111,7 @@ function Layout() {
                 <Form onSubmit={(event) => {
                   event.preventDefault()
                   const q = document.getElementById('searchQuery').value
-                  updateMessagesBySearchQuery(q)
+                  viewState.updateMessagesBySearchQuery(q, 0)
                 }}>
                   <FontAwesomeIcon icon={faMagnifyingGlass}/>
                   <Form.Control type="text" placeholder="Search mail"
@@ -277,27 +129,8 @@ function Layout() {
             <Row>
               <Col sm={12} className="messageTableContainer">
                 {
-                  getMessageDetails ? (
-                    <MessageDetails messageDetailsState={messageDetailsState}/>
-                  ) :
-                  /*
-                   * { list: 'all' }
-                   * { listBySearchQuery: ... }
-                   * { listByFromDomain: ... }
-                   * { listByToDomain: ... }
-                   * { listByCcDomain: ... }
-                   * { listByBccDomain: ... }
-                   */
-                  getViewCondition && (getViewCondition.list
-                  || getViewCondition.listBySearchQuery
-                  || getViewCondition.listByFromDomain
-                  || getViewCondition.listByToDomain
-                  || getViewCondition.listByCcDomain
-                  || getViewCondition.listByBccDomain) ? (
-                    <MessageTable messagesState={messagesState}
-                                  messageDetailsState={messageDetailsState}
-                                  viewConditionState={viewConditionState}/>
-                    ) : <></>
+                  viewState.isDetailsView() ? (<MessageDetails viewState={viewState}/>) :
+                  viewState.isListView() ? (<MessageTable viewState={viewState}/>) : <></>
                 }
               </Col>
             </Row>
