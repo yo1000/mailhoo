@@ -29,8 +29,6 @@
   },
   {
     "name" : "org.hibernate.internal.log.ConnectionAccessLogger_$logger",
-    "methods" : [{ "name" : "<init>", "parameterTypes" : [
-      "org.jboss.logging.Logger"
-    ] }]
+    "methods" : [{ "name" : "<init>", "parameterTypes" : ["org.jboss.logging.Logger"] }]
   }
 ]

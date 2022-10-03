@@ -20,10 +20,10 @@ class WebConfig(
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
-                if (props.allowedOrigins.isNotEmpty()) {
+                props.allowedOrigins?.takeIf { it.isNotEmpty() }?.let {
                     registry
                         .addMapping("/**")
-                        .allowedOrigins(*props.allowedOrigins.toTypedArray())
+                        .allowedOrigins(*it.toTypedArray())
                 }
             }
         }
@@ -32,5 +32,5 @@ class WebConfig(
 
 @ConfigurationProperties(prefix = "mailhoo.web")
 class WebConfigurationProperties(
-    var allowedOrigins: List<String> = emptyList()
+    var allowedOrigins: List<String>?
 )
