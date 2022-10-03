@@ -240,7 +240,7 @@ export default function MessageTable({
                     {
                       createPaginatorIndexes(getMessages.number, getMessages.totalPages).map(i => (
                         <Button variant="outline-secondary"
-                                className={(i === getMessages.number) && 'active'} onClick={
+                                className={i === getMessages.number && 'active'} onClick={
                           () => reload(i)
                         }>{i + 1}</Button>
                       ))
