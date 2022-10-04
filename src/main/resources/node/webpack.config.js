@@ -22,7 +22,8 @@ module.exports = {
             '@babel/preset-react',
             '@babel/preset-env',
             '@emotion/babel-preset-css-prop'
-          ]
+          ],
+          retainLines: debug
         }
       }]
     }, {
