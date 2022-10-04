@@ -1,32 +1,39 @@
-import {useState} from "react";
-
 export default class ViewState {
-  constructor() {
-    const [initialized, setInitialized] = useState(false)
+  constructor({
+    initializedState,
+    fromDomainsState,
+    toDomainsState,
+    ccDomainsState,
+    bccDomainsState,
+    pagedMessagesState,
+    messageDetailsState,
+    viewConditionState
+  }) {
+    const [initialized, setInitialized] = initializedState
     this.initialized = initialized
     this.setInitialized = setInitialized
 
-    const [fromDomains, setFromDomains] = useState()
+    const [fromDomains, setFromDomains] = fromDomainsState
     this.fromDomains = fromDomains
     this.setFromDomains = setFromDomains
 
-    const [toDomains, setToDomains] = useState()
+    const [toDomains, setToDomains] = toDomainsState
     this.toDomains = toDomains
     this.setToDomains = setToDomains
 
-    const [ccDomains, setCcDomains] = useState()
+    const [ccDomains, setCcDomains] = ccDomainsState
     this.ccDomains = ccDomains
     this.setCcDomains = setCcDomains
 
-    const [bccDomains, setBccDomains] = useState()
+    const [bccDomains, setBccDomains] = bccDomainsState
     this.bccDomains = bccDomains
     this.setBccDomains = setBccDomains
 
-    const [pagedMessages, setPagedMessages] = useState()
+    const [pagedMessages, setPagedMessages] = pagedMessagesState
     this.pagedMessages = pagedMessages
     this.setPagedMessages = setPagedMessages
 
-    const [messageDetails, setMessageDetails] = useState()
+    const [messageDetails, setMessageDetails] = messageDetailsState
     this.messageDetails = messageDetails
     this.setMessageDetails = setMessageDetails
 
@@ -38,7 +45,7 @@ export default class ViewState {
      * { listByCcDomain: ... }
      * { listByBccDomain: ... }
      */
-    const [viewCondition, setViewCondition] = useState()
+    const [viewCondition, setViewCondition] = viewConditionState
     this.viewCondition = viewCondition
     this.setViewCondition = setViewCondition
   }

@@ -73,7 +73,16 @@ function Layout() {
     }
   `
 
-  const viewState = new ViewState()
+  const viewState = new ViewState({
+    initializedState: useState(false),
+    fromDomainsState: useState(),
+    toDomainsState: useState(),
+    ccDomainsState: useState(),
+    bccDomainsState: useState(),
+    pagedMessagesState: useState(),
+    messageDetailsState: useState(),
+    viewConditionState: useState()
+  })
 
   const focusSearch = () => {
     document.querySelectorAll('.search form').forEach(elm => {
