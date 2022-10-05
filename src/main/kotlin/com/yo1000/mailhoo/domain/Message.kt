@@ -21,9 +21,10 @@ data class Message(
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
     val receivedCc: Set<ReceivedCc>,
+    // Declare immutable var, because requires lazy updates but JPA not supported copy().
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
-    val receivedBcc: Set<ReceivedBcc>,
+    var receivedBcc: Set<ReceivedBcc>,
     val subject: String?,
     val plainContent: String?,
     val htmlContent: String?,
