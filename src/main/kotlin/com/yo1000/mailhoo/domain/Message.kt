@@ -8,6 +8,13 @@ import javax.persistence.*
  * @author yo1000
  */
 @Entity
+@Table(
+    indexes = [
+        Index(name = "idx_Message_messageId", columnList = "messageId", unique = true),
+        Index(name = "idx_Message_seq", columnList = "seq", unique = true),
+        Index(name = "idx_Message_receivedDate_desc", columnList = "receivedDate DESC")
+    ]
+)
 data class Message(
     @Id
     val id: String = UUID.randomUUID().toString(),
@@ -38,4 +45,5 @@ data class Message(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     val raw: MessageRaw?,
+    val seq: Long
 )

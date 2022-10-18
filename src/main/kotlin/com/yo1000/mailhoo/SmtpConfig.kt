@@ -154,7 +154,8 @@ class SmtpConfig(
                                 bytes = it.toByteArray(),
                             ).let {
                                 messageRawRepos.save(it)
-                            }
+                            },
+                            seq = messageRepos.maxSeq()?.let { it + 1L } ?: 0
                         ).let {
                             messageRepos.save(it)
                         }

@@ -54,6 +54,10 @@ export default class ViewState {
     return process.env.API_BASE_URL
   }
 
+  get NUMBERING_PAGINATOR() {
+    return process.env.NUMBERING_PAGINATOR
+  }
+
   updateFromDomains() {
     fetch(`${this.API_BASE_URL}/domains/from`)
       .then(resp => resp.json())
@@ -78,65 +82,42 @@ export default class ViewState {
       .then(domains => this.setBccDomains(domains))
   }
 
-  updateMessages(page) {
-    fetch(`${this.API_BASE_URL}/messages${page ? `?page=${page}` : ''}`)
+  updateMessages(n, dir, apiBaseUrl, viewCondition, extraCallback) {
+    const pageQuery = this.NUMBERING_PAGINATOR ? (
+      // Paginate by page number
+      !n && n !== 0 ? '' : `page=${n}`
+    ) : (
+      // Paginate by sequence
+      n && dir === 'next' ? `nextSeq=${n}` :
+      n && dir === 'prev' ? `prevSeq=${n}` :
+      'prevSeq=max'
+    )
+
+    this.lockMutex()
+
+    fetch(`${apiBaseUrl}&${pageQuery}`)
       .then(resp => resp.json())
       .then(messages => {
-        this.setViewCondition({ list: 'all' })
+        this.setViewCondition(viewCondition)
         this.setPagedMessages(messages)
         this.setMessageDetails(null)
+
+        this.updatePaginatorStyle(messages)
+        this.unlockMutex()
+        if (extraCallback) extraCallback()
       })
   }
 
-  updateMessagesByFromDomain(domainName, page) {
-    fetch(`${this.API_BASE_URL}/messages?fromDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        this.setViewCondition({ listByFromDomain: domainName })
-        this.setPagedMessages(messages)
-        this.setMessageDetails(null)
-      })
+  lockMutex() {
+    document.querySelectorAll('.mutex').forEach(elm => {
+      elm.classList.add('lock')
+    })
   }
 
-  updateMessagesByToDomain(domainName, page) {
-    fetch(`${this.API_BASE_URL}/messages?toDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        this.setViewCondition({ listByToDomain: domainName })
-        this.setPagedMessages(messages)
-        this.setMessageDetails(null)
-      })
-  }
-
-  updateMessagesByCcDomain(domainName, page) {
-    fetch(`${this.API_BASE_URL}/messages?ccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        this.setViewCondition({ listByCcDomain: domainName })
-        this.setPagedMessages(messages)
-        this.setMessageDetails(null)
-      })
-  }
-
-  updateMessagesByBccDomain(domainName, page) {
-    fetch(`${this.API_BASE_URL}/messages?bccDomain=${domainName}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        this.setViewCondition({ listByBccDomain: domainName })
-        this.setPagedMessages(messages)
-        this.setMessageDetails(null)
-      })
-  }
-
-  updateMessagesBySearchQuery(searchQuery, page) {
-    fetch(`${this.API_BASE_URL}/messages/search?q=${searchQuery}${page ? `&page=${page}` : ''}`)
-      .then(resp => resp.json())
-      .then(messages => {
-        this.setViewCondition({ listBySearchQuery: searchQuery })
-        this.setPagedMessages(messages)
-        this.setMessageDetails(null)
-        this.deactivateDomainFilterStyle()
-      })
+  unlockMutex() {
+    document.querySelectorAll('.mutex').forEach(elm => {
+      elm.classList.remove('lock')
+    })
   }
 
   activateDomainFilterStyle(event) {
@@ -150,28 +131,83 @@ export default class ViewState {
     })
   }
 
-  reload(page) {
+  updatePaginatorStyle(messages) {
+    if (messages && messages.first) {
+      document.querySelectorAll('.next').forEach(elm => {
+        elm.setAttribute("disabled", "disabled")
+      })
+    } else {
+      document.querySelectorAll('.next').forEach(elm => {
+        elm.removeAttribute("disabled")
+      })
+    }
+
+    if (messages && messages.last) {
+      document.querySelectorAll('.prev').forEach(elm => {
+        elm.setAttribute("disabled", "disabled")
+      })
+    } else {
+      document.querySelectorAll('.prev').forEach(elm => {
+        elm.removeAttribute("disabled")
+      })
+    }
+  }
+
+  renderWithUpdateDomains({n, dir, filter}) {
     this.updateFromDomains()
     this.updateToDomains()
     this.updateCcDomains()
     this.updateBccDomains()
 
-    const reloadPage = page ? page :
-      this.pagedMessages ? this.pagedMessages.number :
-      0
+    this.render({n: n, dir: dir, filter: filter})
+  }
 
-    if (this.viewCondition && this.viewCondition.listBySearchQuery) {
-      this.updateMessagesBySearchQuery(this.viewCondition.listBySearchQuery, reloadPage)
-    } else if (this.viewCondition && this.viewCondition.listByFromDomain) {
-      this.updateMessagesByFromDomain(this.viewCondition.listByFromDomain, reloadPage)
-    } else if (this.viewCondition && this.viewCondition.listByToDomain) {
-      this.updateMessagesByToDomain(this.viewCondition.listByToDomain, reloadPage)
-    } else if (this.viewCondition && this.viewCondition.listByCcDomain) {
-      this.updateMessagesByCcDomain(this.viewCondition.listByCcDomain, reloadPage)
-    } else if (this.viewCondition && this.viewCondition.listByBccDomain) {
-      this.updateMessagesByBccDomain(this.viewCondition.listByBccDomain, reloadPage)
+  render({n, dir, filter}) {
+    const pageNumber = (n || n === 0) ? n :
+      (this.viewCondition && this.viewCondition.number) ? this.viewCondition.number :
+      !this.NUMBERING_PAGINATOR ? 'max' : 0
+
+    const direction = dir ? dir :
+      (this.viewCondition && this.viewCondition.dir) ? this.viewCondition.dir :
+      !this.NUMBERING_PAGINATOR ? 'prev' : null
+
+    const searchQuery = filter ? filter.q : this.viewCondition && this.viewCondition.listBySearchQuery
+    const fromDomain = filter ? filter.from : this.viewCondition && this.viewCondition.listByFromDomain
+    const toDomain = filter ? filter.to : this.viewCondition && this.viewCondition.listByToDomain
+    const ccDomain = filter ? filter.cc : this.viewCondition && this.viewCondition.listByCcDomain
+    const bccDomain = filter ? filter.bcc : this.viewCondition && this.viewCondition.listByBccDomain
+
+    if (searchQuery) {
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages/search?q=${searchQuery.q}&f=${searchQuery.f}`,
+        { listBySearchQuery: searchQuery, number: pageNumber, dir: direction },
+        () => { this.deactivateDomainFilterStyle() }
+      )
+    } else if (fromDomain) {
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages?fromDomain=${fromDomain}`,
+        { listByFromDomain: fromDomain, number: pageNumber, dir: direction },
+      )
+    } else if (toDomain) {
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages?toDomain=${toDomain}`,
+        { listByToDomain: toDomain, number: pageNumber, dir: direction },
+      )
+    } else if (ccDomain) {
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages?ccDomain=${ccDomain}`,
+        { listByCcDomain: ccDomain, number: pageNumber, dir: direction },
+      )
+    } else if (bccDomain) {
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages?bccDomain=${bccDomain}`,
+        { listByBccDomain: bccDomain, number: pageNumber, dir: direction },
+      )
     } else {
-      this.updateMessages(reloadPage)
+      this.updateMessages(pageNumber, direction,
+        `${this.API_BASE_URL}/messages?all`,
+        { list: 'all', number: n, dir: dir },
+      )
     }
   }
 

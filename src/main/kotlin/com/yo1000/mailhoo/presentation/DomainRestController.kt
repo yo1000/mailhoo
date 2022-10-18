@@ -1,9 +1,6 @@
 package com.yo1000.mailhoo.presentation
 
-import com.yo1000.mailhoo.domain.ReceivedBccRepository
-import com.yo1000.mailhoo.domain.ReceivedCcRepository
-import com.yo1000.mailhoo.domain.ReceivedToRepository
-import com.yo1000.mailhoo.domain.SentFromRepository
+import com.yo1000.mailhoo.domain.AddressRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -15,37 +12,25 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/domains")
 class DomainRestController(
-    private val sentFromRepos: SentFromRepository,
-    private val receivedToRepos: ReceivedToRepository,
-    private val receivedCcRepos: ReceivedCcRepository,
-    private val receivedBccRepos: ReceivedBccRepository,
-
+    private val addressRepository: AddressRepository
 ) {
     @GetMapping("/from")
     fun getSenderDomains(): List<String> {
-        return sentFromRepos.findAll()
-            .map { it.address.domain }
-            .distinct()
+        return addressRepository.findAllFromDomain()
     }
 
     @GetMapping("/to")
     fun getToDomains(): List<String> {
-        return receivedToRepos.findAll()
-            .map { it.address.domain }
-            .distinct()
+        return addressRepository.findAllToDomain()
     }
 
     @GetMapping("/cc")
     fun getCcDomains(): List<String> {
-        return receivedCcRepos.findAll()
-            .map { it.address.domain }
-            .distinct()
+        return addressRepository.findAllCcDomain()
     }
 
     @GetMapping("/bcc")
     fun getBccDomains(): List<String> {
-        return receivedBccRepos.findAll()
-            .map { it.address.domain }
-            .distinct()
+        return addressRepository.findAllBccDomain()
     }
 }

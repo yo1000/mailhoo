@@ -38,7 +38,8 @@ module.exports = {
   },
   plugins: [
     new webpack.EnvironmentPlugin({
-      API_BASE_URL: ""
+      API_BASE_URL: "",
+      NUMBERING_PAGINATOR: true,
     }),
   ],
   devServer: {

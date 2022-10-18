@@ -2,7 +2,8 @@ import React from "react";
 import {css} from "@emotion/react";
 import {Row, Col, Button, ButtonGroup, ButtonToolbar} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faAngleRight, faFile, faRotateRight} from '@fortawesome/free-solid-svg-icons'
+import {faAngleRight, faFile, faRotateRight, faAngleLeft} from '@fortawesome/free-solid-svg-icons'
+import {ReplyIcon} from "@primer/octicons-react";
 
 import colors from '../colors'
 
@@ -14,6 +15,17 @@ import colors from '../colors'
  */
 export default function MessageTable({viewState}) {
   const style = css`
+    .mutex.lock {
+      cursor: not-allowed;
+      
+      input,
+      button,
+      li {
+        pointer-events: none;
+        color: ${colors.foregroundSecondary};
+      }
+    }
+    
     .header {
       margin: 0 0 1.5rem;
       position: relative;
@@ -58,11 +70,6 @@ export default function MessageTable({viewState}) {
           max-width: 14rem;
           white-space: nowrap;
           overflow: hidden;
-          
-          svg {
-            margin-left: -3px;
-            margin-right: .125rem;
-          }
         }
         
         .subject,
@@ -124,20 +131,21 @@ export default function MessageTable({viewState}) {
     <div css={style}>
       <div className="header">
         <Row>
-          <Col className="reload">
-            <Button variant="outline-secondary" onClick={() => viewState.reload()}>
+          <Col className="reload mutex">
+            <Button variant="outline-secondary" onClick={() => viewState.renderWithUpdateDomains({})}>
               <FontAwesomeIcon icon={faRotateRight}/> Reload
             </Button>
           </Col>
-          <Col className="paginator">
+          <Col className="paginator mutex">
             {
-              viewState.pagedMessages && viewState.pagedMessages.totalPages && (
+              (viewState.pagedMessages && viewState.pagedMessages.totalPages)
+                ? viewState.NUMBERING_PAGINATOR ? (
                 <ButtonToolbar>
                   {
                     (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number > 4) && (
                       <ButtonGroup className="me-2">
                         <Button variant="outline-secondary" onClick={
-                          () => viewState.reload(0)
+                          () => viewState.render({n: 0})
                         }>{1}</Button>
                       </ButtonGroup>
                     )
@@ -147,7 +155,7 @@ export default function MessageTable({viewState}) {
                       createPaginatorIndexes(viewState.pagedMessages.number, viewState.pagedMessages.totalPages).map(i => (
                         <Button variant="outline-secondary"
                                 className={i === viewState.pagedMessages.number && 'active'} onClick={
-                          () => viewState.reload(i)
+                          () => viewState.render({n: i})
                         }>{i + 1}</Button>
                       ))
                     }
@@ -156,13 +164,30 @@ export default function MessageTable({viewState}) {
                     (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number + 5 < viewState.pagedMessages.totalPages) && (
                       <ButtonGroup className="me-2">
                         <Button variant="outline-secondary" onClick={
-                          () => viewState.reload(viewState.pagedMessages.totalPages - 1)
+                          () => viewState.render({n: viewState.pagedMessages.totalPages - 1})
                         }>{viewState.pagedMessages.totalPages}</Button>
                       </ButtonGroup>
                     )
                   }
                 </ButtonToolbar>
-              )
+              ) : (
+                  <ButtonToolbar>
+                    <ButtonGroup className="me-2">
+                      <Button variant="outline-secondary" className="next" onClick={
+                        () => viewState.render({
+                          n: viewState.pagedMessages.content[0].seq + 1,
+                          dir: 'next'
+                        })
+                      }><FontAwesomeIcon icon={faAngleLeft}/></Button>
+                      <Button variant="outline-secondary" className="prev" onClick={
+                        () => viewState.render({
+                          n: viewState.pagedMessages.content[viewState.pagedMessages.content.length - 1].seq,
+                          dir: 'prev'
+                        })
+                      }><FontAwesomeIcon icon={faAngleRight}/></Button>
+                    </ButtonGroup>
+                  </ButtonToolbar>
+              ) : <></>
             }
           </Col>
         </Row>
@@ -216,13 +241,15 @@ function ItemEmail({
     
     .receiver {
       color: #5f6368;
-    }
-  
-    .arrow {
-      margin-left: .0625rem;
-      margin-right: .0625rem;
-      width: .9rem;
-      height: .9rem;
+      
+      .arrow {
+        margin-left: .5rem;
+        margin-right: .25rem;
+        width: .9rem;
+        height: .9rem;
+        
+        transform: rotate(180deg);
+      }
     }
   `
 
@@ -237,7 +264,8 @@ function ItemEmail({
         {fromList.join(', ')}
       </div>
       <div className="receiver">
-        <FontAwesomeIcon icon={faAngleRight} className="arrow"/>
+        <ReplyIcon size={14} className="arrow"/>
+        {/*<FontAwesomeIcon icon={faTurnUp} className="arrow"/>*/}
         {toList.concat(ccList).concat(bccList).join(', ')}
       </div>
     </div>

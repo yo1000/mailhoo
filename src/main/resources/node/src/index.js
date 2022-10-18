@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import {css} from "@emotion/react";
-import {Row, Col, Stack, Form, Button} from "react-bootstrap";
+import {Row, Col, Stack, Form, InputGroup} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {MarkGithubIcon} from '@primer/octicons-react'
@@ -18,26 +18,49 @@ function Layout() {
     margin: 1rem 1.5rem 0;
     padding: 0;
     color: ${colors.foreground};
+
+    .mutex.lock {
+      cursor: not-allowed;
+      
+      input,
+      button,
+      li {
+        pointer-events: none;
+        color: ${colors.foregroundSecondary};
+      }
+    }
     
     .search form {
-      margin-top: -30px;
+      margin-top: -7px;
+      
+      .form-select {
+        max-width: 10rem;
+        padding-left: 1.75rem;
+        border-right: 0;
+      }
       
       input {
         &::placeholder {
-          padding-left: 1.5rem;
           color: ${colors.foregroundSecondary};
         }
         
-        &:focus {
-          border-color: #6c757d;
-          box-shadow: 0 0 0 0.25rem rgb(108 117 125 / 50%);
+        &:-internal-autofill-selected,
+        &:-internal-autofill-selected:focus {
+          -webkit-box-shadow: 0 0 0px 10rem ${colors.background} inset;
         }
       }
       
+      .form-select:focus,
+      input:focus {
+        border-color: #6c757d;
+        box-shadow: 0 0 0 0.25rem rgb(108 117 125 / 50%);
+      }
+      
       svg {
-        position: relative;
-        top: 2rem;
+        position: absolute;
+        top: .75rem;
         left: .75rem;
+        z-index: 10;
         color: ${colors.foregroundSecondary};
       }
       
@@ -101,7 +124,7 @@ function Layout() {
 
   useEffect(() => {
     if (!viewState.initialized) {
-      viewState.reload()
+      viewState.renderWithUpdateDomains({})
       viewState.setInitialized(true)
     }
   })
@@ -120,13 +143,27 @@ function Layout() {
                 <Form onSubmit={(event) => {
                   event.preventDefault()
                   const q = document.getElementById('searchQuery').value
-                  viewState.updateMessagesBySearchQuery(q, 0)
+                  const f = document.getElementById('searchField').value
+                  viewState.updateMessages(null, null,
+                    `${viewState.API_BASE_URL}/messages/search?q=${q}&f=${f}`,
+                    { listBySearchQuery: { q: q, f: f }, number: null, dir: null },
+                    () => { viewState.deactivateDomainFilterStyle() }
+                  )
                 }}>
-                  <FontAwesomeIcon icon={faMagnifyingGlass}/>
-                  <Form.Control type="text" placeholder="Search mail"
-                                id="searchQuery"
-                                onFocus={focusSearch}
-                                onBlur={blurSearch}/>
+                  <InputGroup className="mb-3">
+                    <Form.Select id="searchField">
+                      <option value="subject">Subject</option>
+                      <option value="content">Content</option>
+                      <option value="from">From</option>
+                      <option value="to">To</option>
+                      <option value="cc">Cc</option>
+                      <option value="bcc">Bcc</option>
+                      <option value="attachment">Attachment</option>
+                    </Form.Select>
+                    <FontAwesomeIcon icon={faMagnifyingGlass}/>
+                    <Form.Control type="text" placeholder="Search mail"
+                                  id="searchQuery"/>
+                  </InputGroup>
                 </Form>
               </Col>
               <Col className="github">
