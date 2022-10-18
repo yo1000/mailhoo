@@ -46,6 +46,12 @@ export default function MessageTable({viewState}) {
         
         .btn {
           min-width: 2.375rem;
+          
+          &.current {
+            color: ${colors.formControl.foregroundActive};
+            background-color: ${colors.formControl.backgroundActive};
+            border-color: ${colors.formControl.backgroundActive};
+          }
         }
       }
     }
@@ -154,7 +160,7 @@ export default function MessageTable({viewState}) {
                     {
                       createPaginatorIndexes(viewState.pagedMessages.number, viewState.pagedMessages.totalPages).map(i => (
                         <Button variant="outline-secondary"
-                                className={i === viewState.pagedMessages.number && 'active'} onClick={
+                                className={i === viewState.pagedMessages.number && 'active current'} onClick={
                           () => viewState.render({n: i})
                         }>{i + 1}</Button>
                       ))

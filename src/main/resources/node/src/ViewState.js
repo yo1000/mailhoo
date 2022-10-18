@@ -122,12 +122,12 @@ export default class ViewState {
 
   activateDomainFilterStyle(event) {
     this.deactivateDomainFilterStyle()
-    event.target.classList.add('active')
+    event.target.classList.add('current')
   }
 
   deactivateDomainFilterStyle() {
-    document.querySelectorAll('.active').forEach(elm => {
-      elm.classList.remove('active')
+    document.querySelectorAll('.current').forEach(elm => {
+      elm.classList.remove('current')
     })
   }
 

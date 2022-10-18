@@ -52,7 +52,7 @@ function Layout() {
       
       .form-select:focus,
       input:focus {
-        border-color: #6c757d;
+        border-color: ${colors.formControl.backgroundActive};
         box-shadow: 0 0 0 0.25rem rgb(108 117 125 / 50%);
       }
       

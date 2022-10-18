@@ -38,7 +38,7 @@ export default function DomainList({viewState}) {
         padding: .25rem .25rem .25rem 1rem;
         border-radius: 2rem;
   
-        &.active,
+        &.current,
         &:hover {
           background: rgba(0, 0, 0, .075);
         }
@@ -57,7 +57,7 @@ export default function DomainList({viewState}) {
   return (
     <div css={style}>
       <ul className="mutex">
-        <li className="active" onClick={(event) => {
+        <li className="current" onClick={(event) => {
           viewState.updateMessages(null, null,
             `${viewState.API_BASE_URL}/messages?all`,
             { list: 'all', number: null, dir: null },
