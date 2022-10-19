@@ -145,7 +145,7 @@ export default function MessageTable({viewState}) {
           <Col className="paginator mutex">
             {
               (viewState.pagedMessages && viewState.pagedMessages.totalPages)
-                ? viewState.NUMBERING_PAGINATOR ? (
+                ? (
                 <ButtonToolbar>
                   {
                     (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number > 4) && (
@@ -176,23 +176,6 @@ export default function MessageTable({viewState}) {
                     )
                   }
                 </ButtonToolbar>
-              ) : (
-                  <ButtonToolbar>
-                    <ButtonGroup className="me-2">
-                      <Button variant="outline-secondary" className="next" onClick={
-                        () => viewState.render({
-                          n: viewState.pagedMessages.content[0].seq + 1,
-                          dir: 'next'
-                        })
-                      }><FontAwesomeIcon icon={faAngleLeft}/></Button>
-                      <Button variant="outline-secondary" className="prev" onClick={
-                        () => viewState.render({
-                          n: viewState.pagedMessages.content[viewState.pagedMessages.content.length - 1].seq,
-                          dir: 'prev'
-                        })
-                      }><FontAwesomeIcon icon={faAngleRight}/></Button>
-                    </ButtonGroup>
-                  </ButtonToolbar>
               ) : <></>
             }
           </Col>

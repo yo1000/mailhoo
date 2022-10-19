@@ -33,23 +33,6 @@ interface MessageRepository : JpaRepository<Message, String> {
 
     @Query(
         """
-        SELECT DISTINCT
-            m
-        FROM
-            Message m
-        WHERE
-            m.seq >= :seqGte
-        AND
-            m.seq < :seqLt
-    """
-    )
-    fun findAllBySeqLessThanAndSeqGreaterThanEquals(
-        @Param("seqGte") seqGte: Long,
-        @Param("seqLt") seqLt: Long,
-    ): List<Message>
-
-    @Query(
-        """
         SELECT
             MAX(m.seq)
         FROM
@@ -57,38 +40,4 @@ interface MessageRepository : JpaRepository<Message, String> {
     """
     )
     fun maxSeq(): Long?
-
-    @Query(
-        """
-        SELECT
-            MIN(m.seq)
-        FROM
-            Message m
-    """
-    )
-    fun minSeq(): Long?
-
-    @Query(
-        """
-        SELECT
-            MAX(m.seq)
-        FROM
-            Message m
-        WHERE
-            m.seq < :seqLt
-    """
-    )
-    fun maxSeqBySeqLessThan(@Param("seqLt") seqLt: Long): Long?
-
-    @Query(
-        """
-        SELECT
-            MIN(m.seq)
-        FROM
-            Message m
-        WHERE
-            m.seq >= :seqGte
-    """
-    )
-    fun minSeqBySeqGreaterThanEquals(@Param("seqGte") seqGte: Long): Long?
 }

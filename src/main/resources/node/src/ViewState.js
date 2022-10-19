@@ -54,10 +54,6 @@ export default class ViewState {
     return process.env.API_BASE_URL
   }
 
-  get NUMBERING_PAGINATOR() {
-    return process.env.NUMBERING_PAGINATOR
-  }
-
   updateFromDomains() {
     fetch(`${this.API_BASE_URL}/domains/from`)
       .then(resp => resp.json())
@@ -83,15 +79,7 @@ export default class ViewState {
   }
 
   updateMessages(n, dir, apiBaseUrl, viewCondition, extraCallback) {
-    const pageQuery = this.NUMBERING_PAGINATOR ? (
-      // Paginate by page number
-      !n && n !== 0 ? '' : `page=${n}`
-    ) : (
-      // Paginate by sequence
-      n && dir === 'next' ? `nextSeq=${n}` :
-      n && dir === 'prev' ? `prevSeq=${n}` :
-      'prevSeq=max'
-    )
+    const pageQuery = !n && n !== 0 ? '' : `page=${n}`
 
     this.lockMutex()
 
@@ -164,12 +152,10 @@ export default class ViewState {
 
   render({n, dir, filter}) {
     const pageNumber = (n || n === 0) ? n :
-      (this.viewCondition && this.viewCondition.number) ? this.viewCondition.number :
-      !this.NUMBERING_PAGINATOR ? 'max' : 0
+      (this.viewCondition && this.viewCondition.number) ? this.viewCondition.number : 0
 
     const direction = dir ? dir :
-      (this.viewCondition && this.viewCondition.dir) ? this.viewCondition.dir :
-      !this.NUMBERING_PAGINATOR ? 'prev' : null
+      (this.viewCondition && this.viewCondition.dir) ? this.viewCondition.dir : null
 
     const searchQuery = filter ? filter.q : this.viewCondition && this.viewCondition.listBySearchQuery
     const fromDomain = filter ? filter.from : this.viewCondition && this.viewCondition.listByFromDomain
