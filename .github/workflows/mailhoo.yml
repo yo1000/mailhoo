@@ -59,11 +59,25 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: mailhoo-ubuntu-latest
-          path: target/mailhoo
+          path: target
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
         run: |
           chmod +x target/mailhoo
+          ls -al target
+          
           VERSION=$(echo '${{ github.ref }}' | sed -e 's/refs\/tags\///g' | sed -e 's/refs\/heads\///g')
           
           docker build -t yo1000/mailhoo:$VERSION --build-arg APP_LOCATION=target/mailhoo .
           docker image ls
+          
+          docker tag yo1000/mailhoo:$VERSION ghcr.io/yo1000/mailhoo:$VERSION
+          docker tag yo1000/mailhoo:$VERSION ghcr.io/yo1000/mailhoo:latest
+          
+          docker push ghcr.io/yo1000/mailhoo:$VERSION
+          docker push ghcr.io/yo1000/mailhoo:latest
