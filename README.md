@@ -10,6 +10,71 @@ Mailhoo is a SMTP server for development inspired by [MailHog](https://github.co
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 
 
+How to run
+----------
+
+### Run with Docker image
+
+```shell
+docker run ghcr.io/yo1000/mailhoo
+```
+
+### Run with Docker image and use an external database as a data store
+
+```shell
+docker run \
+  --env SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/mailhoo \
+  --env SPRING_DATASOURCE_USERNAME=postgres \
+  --env SPRING_DATASOURCE_PASSWORD=postgres \
+  ghcr.io/yo1000/mailhoo
+```
+
+The following other databases are available.
+
+| Database     | JDBC Url example                         |
+|:-------------|:-----------------------------------------|
+| H2 (default) | jdbc:h2:mem:mailhoo                      |
+| PoasgreSQL   | jdbc:postgresql://localhost:5432/mailhoo |
+| MySQL        | jdbc:mysql://localhost:3306/mailhoo      |
+| MariaDB      | jdbc:mariadb://localhost:3306/mailhoo    |
+
+### Run with native image
+
+```shell
+curl -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.0.0/mailhoo && ./mailhoo
+```
+
+### Run with Java ARchive (jar)
+
+See "Build Requirements" below for build requirements.
+
+```shell
+./mvnw package && \
+java -jar target/mailhoo-0.0.1-SNAPSHOT.jar
+```
+
+### Run with Maven for development
+
+See "Build Requirements" below for build requirements.
+
+```shell
+./mvnw clean spring-boot:run -Dspring-boot.run.jvmArguments="
+  -Dspring.jpa.show-sql=true
+  -Dspring.h2.console.enabled=true
+  -Dserver.error.whitelabel.enabled=true
+  -Dmailhoo.web.allowed-origins=http://localhost:8081
+" &
+
+cd src/main/resources/node
+NODE_ENV=development \
+PORT=8081 \
+API_BASE_URL=http://localhost:8080 \
+npx webpack serve &
+
+open http://localhost:8081
+```
+
+
 Build Requirements
 ------------------
 
@@ -17,7 +82,7 @@ When make a jar package.
 
 - Java 17
 
-When make a GraalVM based native binary.
+When make a GraalVM based native image.
 
 - GraalVM CE 22
 
@@ -42,96 +107,4 @@ for GraalVM based native binary.
 
 ```shell
 ./mvnw clean package -Pnative
-```
-
-
-How to run
-----------
-
-for Production by Java ARchive (jar).
-
-```shell
-java -jar target/mailhoo-0.0.1-SNAPSHOT.jar
-```
-
-for Production by GraalVM based native binary.
-
-```shell
-./target/mailhoo
-```
-
-for Development.
-
-```shell
-./mvnw clean spring-boot:run -Dspring-boot.run.jvmArguments="
-  -Dspring.jpa.show-sql=true
-  -Dspring.h2.console.enabled=true
-  -Dserver.error.whitelabel.enabled=true
-  -Dmailhoo.web.allowed-origins=http://localhost:8081
-" &
-
-cd src/main/resources/node
-NODE_ENV=development \
-PORT=8081 \
-API_BASE_URL=http://localhost:8080 \
-npx webpack serve &
-
-open http://localhost:8081
-```
-
-
-### Multi database support
-
-Standard supports are follows.
-
-- H2 (default, in-memory mode)
-- PostgreSQL
-- MySQL
-- MariaDB
-
-for example: Using PostgreSQL.
-
-```shell
-docker run -d -p5432:5432 \
--ePOSTGRES_DB=postgres \
--ePOSTGRES_USER=postgres \
--ePOSTGRES_PASSWORD=postgres \
-postgres:latest
-
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postgres
-export SPRING_DATASOURCE_USERNAME=postgres
-export SPRING_DATASOURCE_PASSWORD=postgres
-./target/mailhoo
-```
-
-for example: Using MySQL.
-
-```shell
-docker run -d -p3306:3306 \
--eMYSQL_DATABASE=my \
--eMYSQL_USER=my \
--eMYSQL_PASSWORD=my \
--eMYSQL_ROOT_PASSWORD=my \
-mysql:latest
-
-export SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/my
-export SPRING_DATASOURCE_USERNAME=my
-export SPRING_DATASOURCE_PASSWORD=my
-./target/mailhoo
-```
-
-for example: Using MariaDB.
-
-```shell
-docker run -d -p3306:3306 \
--eMARIADB_DATABASE=maria \
--eMARIADB_USER=maria \
--eMARIADB_PASSWORD=maria \
--eMARIADB_ROOT_PASSWORD=maria \
-mariadb:latest
-
-export SPRING_DATASOURCE_URL=jdbc:mariadb://localhost:3306/maria
-export SPRING_DATASOURCE_USERNAME=maria
-export SPRING_DATASOURCE_PASSWORD=maria
-./target/mailhoo
 ```
