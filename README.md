@@ -41,7 +41,7 @@ The following other databases are available.
 ### Run with native image
 
 ```shell
-curl -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.0.0/mailhoo && ./mailhoo
+curl -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.0.0/mailhoo-linux && ./mailhoo
 ```
 
 ### Run with Java ARchive (jar)
