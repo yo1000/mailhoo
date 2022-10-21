@@ -16,13 +16,18 @@ How to run
 ### Run with Docker image
 
 ```shell
-docker run ghcr.io/yo1000/mailhoo
+docker run \
+  -p 8080:8080 \
+  -p 1025:1025 \
+  ghcr.io/yo1000/mailhoo
 ```
 
 ### Run with Docker image and use an external database as a data store
 
 ```shell
 docker run \
+  -p 8080:8080 \
+  -p 1025:1025 \
   --env SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/mailhoo \
   --env SPRING_DATASOURCE_USERNAME=postgres \
   --env SPRING_DATASOURCE_PASSWORD=postgres \
