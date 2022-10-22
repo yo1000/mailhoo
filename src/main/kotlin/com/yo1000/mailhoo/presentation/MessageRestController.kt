@@ -4,7 +4,6 @@ import com.yo1000.mailhoo.domain.*
 import org.apache.commons.mail.util.MimeMessageParser
 import org.springframework.core.io.InputStreamResource
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault

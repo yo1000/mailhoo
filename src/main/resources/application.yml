@@ -1,6 +1,7 @@
 mailhoo:
   smtp.port: 1025
   web.allowed-origins:
+  data.jpa.table-name-prefix:
 
 spring:
   datasource:
@@ -10,6 +11,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: com.yo1000.mailhoo.infrastructure.TableNameStrategy
     properties:
       hibernate:
         default_batch_fetch_size: 1000
