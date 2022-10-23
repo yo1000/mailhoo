@@ -171,7 +171,9 @@ class MessageRestController(
 
     @ExceptionHandler(NullPointerException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun handleNotFound(e: Exception) {}
+    fun handleNotFound(e: Exception) {
+        // NOP
+    }
 
     private fun getPagedMessages(
         fromDomainName: String?, toDomainName: String?, ccDomainName: String?, bccDomainName: String?,
