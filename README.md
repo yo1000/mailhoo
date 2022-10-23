@@ -25,10 +25,20 @@ docker run \
 ### Run with Docker image and use an external database as a data store
 
 ```shell
+docker network create mailhoo
+
 docker run \
+  --net mailhoo \
+  --name mailhoo_database \
+  --env POSTGRES_DB=mailhoo \
+  --env POSTGRES_PASSWORD=postgres \
+  postgres &
+
+docker run \
+  --net mailhoo \
   -p 8080:8080 \
   -p 1025:1025 \
-  --env SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/mailhoo \
+  --env SPRING_DATASOURCE_URL=jdbc:postgresql://mailhoo_database:5432/mailhoo \
   --env SPRING_DATASOURCE_USERNAME=postgres \
   --env SPRING_DATASOURCE_PASSWORD=postgres \
   ghcr.io/yo1000/mailhoo
@@ -36,17 +46,18 @@ docker run \
 
 The following other databases are available.
 
-| Database     | JDBC Url example                         |
-|:-------------|:-----------------------------------------|
-| H2 (default) | jdbc:h2:mem:mailhoo                      |
-| PoasgreSQL   | jdbc:postgresql://localhost:5432/mailhoo |
-| MySQL        | jdbc:mysql://localhost:3306/mailhoo      |
-| MariaDB      | jdbc:mariadb://localhost:3306/mailhoo    |
+| Database     | JDBC Url example                               |
+|:-------------|:-----------------------------------------------|
+| H2 (default) | jdbc:h2:mem:mailhoo                            |
+| PoasgreSQL   | jdbc:postgresql://{containerName}:5432/mailhoo |
+| MySQL        | jdbc:mysql://{containerName}:3306/mailhoo      |
+| MariaDB      | jdbc:mariadb://{containerName}:3306/mailhoo    |
 
 ### Run with native image
 
 ```shell
-curl -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.0.0/mailhoo-linux && ./mailhoo
+curl -L -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.1.0/mailhoo-linux && \
+./mailhoo
 ```
 
 ### Run with Java ARchive (jar)
@@ -54,8 +65,8 @@ curl -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.0.0/mailho
 See "Build Requirements" below for build requirements.
 
 ```shell
-./mvnw package && \
-java -jar target/mailhoo-0.0.1-SNAPSHOT.jar
+curl -L -o mailhoo.jar https://github.com/yo1000/mailhoo/releases/download/1.1.0/mailhoo-1.1.0.jar && \
+java -jar mailhoo.jar
 ```
 
 ### Run with Maven for development
