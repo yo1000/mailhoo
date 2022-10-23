@@ -1,5 +1,6 @@
 package com.yo1000.mailhoo
 
+import com.sun.mail.handlers.*
 import com.yo1000.mailhoo.infrastructure.TableNameStrategy
 import org.hibernate.internal.log.`ConnectionAccessLogger_$logger`
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
@@ -22,6 +23,7 @@ import org.springframework.nativex.hint.TypeAccess
 import org.springframework.nativex.hint.TypeHint
 import java.util.*
 
+
 @NativeHint(options = [
 	"-H:+AddAllCharsets",
 	"-H:IncludeResources=META-INF/mailcap",
@@ -31,21 +33,36 @@ import java.util.*
 	"-H:IncludeResources=META-INF/javamail.charset.map",
 	"-H:IncludeResources=META-INF/javamail.default.providers",
 	"-H:IncludeResources=META-INF/services/javax.mail.Provider",
-	"-H:ReflectionConfigurationFiles=classes/reflectconfig.json",
 ])
 @TypeHint(
 	types = [
-		JpaRepository::class,
-		PagingAndSortingRepository::class,
-		CrudRepository::class,
-		Repository::class,
-		QueryByExampleExecutor::class,
 		Optional::class,
+		Repository::class,
+		CrudRepository::class,
+		PagingAndSortingRepository::class,
+		JpaRepository::class,
+		QueryByExampleExecutor::class,
 		FluentQuery::class,
 		FluentQuery.FetchableFluentQuery::class,
+		image_gif::class,
+		image_jpeg::class,
+		message_rfc822::class,
+		multipart_mixed::class,
+		text_html::class,
+		text_plain::class,
+		text_xml::class,
 		`ConnectionAccessLogger_$logger`::class,
+		MailhooConfigurationProperties::class,
+		MailhooConfigurationProperties.Smtp::class,
+		MailhooConfigurationProperties.Web::class,
+		MailhooConfigurationProperties.Data::class,
+		MailhooConfigurationProperties.Data.Jpa::class,
 	],
-	access = [TypeAccess.QUERY_PUBLIC_METHODS]
+	access = [
+		TypeAccess.DECLARED_CONSTRUCTORS,
+		TypeAccess.PUBLIC_METHODS,
+		TypeAccess.QUERY_PUBLIC_METHODS
+	]
 )
 @SpringBootApplication
 @EnableJpaRepositories
@@ -70,7 +87,7 @@ data class MailhooConfigurationProperties(
 	var data: Data? = null,
 ) {
 	data class Smtp(
-		var port: Int? = null
+		var port: Int? = null,
 	)
 
 	data class Web(
@@ -78,10 +95,10 @@ data class MailhooConfigurationProperties(
 	)
 
 	data class Data(
-		var jpa: Jpa? = null
+		var jpa: Jpa? = null,
 	) {
 		data class Jpa(
-			var tableNamePrefix: String? = null
+			var tableNamePrefix: String? = null,
 		)
 	}
 }
