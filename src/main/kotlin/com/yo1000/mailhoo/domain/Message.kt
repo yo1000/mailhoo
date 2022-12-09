@@ -32,8 +32,11 @@ data class Message(
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
     var receivedBcc: Set<ReceivedBcc>,
+    @Lob
     val subject: String?,
+    @Lob
     val plainContent: String?,
+    @Lob
     val htmlContent: String?,
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
