@@ -232,8 +232,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<nodeVersion>v16.17.0</nodeVersion>
-					<npmVersion>8.15.0</npmVersion>
+					<nodeVersion>v18.12.1</nodeVersion>
+					<npmVersion>8.19.2</npmVersion>
 
 					<!-- optional: where to download node and npm from. Defaults to https://nodejs.org/dist/ -->
 					<!--<downloadRoot>https://nodejs.org/dist/</downloadRoot>-->
