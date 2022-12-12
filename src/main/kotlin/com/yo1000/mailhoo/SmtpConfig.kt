@@ -94,7 +94,7 @@ class SmtpConfig(
                             messageId = mimeMessage.messageID,
                             sentFrom = setOf(SentFrom(
                                 address = addressRepos.findOrSave(Address(
-                                    displayName = wiserMessage.envelopeSenderDisplayName,
+                                    displayName = wiserMessage.findDisplayName(true),
                                     email = wiserMessage.envelopeSender,
                                 )),
                             ).let {
@@ -194,7 +194,7 @@ class SmtpConfig(
                 when (encodeType?.uppercase()) {
                     "B" -> String(Base64.getDecoder().decode(encodedValue), Charset.forName(encode))
                     "Q" -> QuotedPrintableCodec(encode).decode(encodedValue)
-                    else -> null
+                    else -> it.replace(Regex("\\s*<\\Q${email}\\E>"), "").trim()
                 }
             }
             .firstOrNull()
