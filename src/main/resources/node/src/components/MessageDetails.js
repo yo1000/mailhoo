@@ -107,14 +107,14 @@ export default function MessageDetails({viewState}) {
   `
 
   const CONTENT_VIEW_TYPE_INDEXES = {
-    PLAIN: 0,
-    HTML: 1,
+    HTML: 0,
+    PLAIN: 1,
     HEADERS: 2,
   }
 
   const CONTENT_VIEW_TYPES = [
-    { name: 'Plain', value: '1' },
-    { name: 'Html', value: '2' },
+    { name: 'Html', value: '1' },
+    { name: 'Plain', value: '2' },
     { name: 'Headers', value: '3' },
   ]
 
@@ -222,14 +222,14 @@ export default function MessageDetails({viewState}) {
     </div>
     <div>
     {
-      getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value
-        ? (<p>{viewState.messageDetails.plainContent}</p>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value
         ? (<div dangerouslySetInnerHTML={{__html: dompurify
             .sanitize(viewState.messageDetails.htmlContent)
             .replace(/href/g, "target='_blank' rel='noopener noreferrer' href")
             .replace(/target=["']?[a-zA-Z_]*["']?/g, "target='_blank'")
         }}/>) :
+      getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value
+        ? (<pre>{viewState.messageDetails.plainContent}</pre>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HEADERS].value
         ? (<code css={styleHeaders}><pre>{viewState.messageDetails.headers}</pre></code>)
         : (<></>)

@@ -2,8 +2,8 @@ import React from "react";
 import {css} from "@emotion/react";
 import {Row, Col, Button, ButtonGroup, ButtonToolbar} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faAngleRight, faFile, faRotateRight, faAngleLeft} from '@fortawesome/free-solid-svg-icons'
-import {ReplyIcon} from "@primer/octicons-react";
+import {faFile, faRotateRight} from '@fortawesome/free-solid-svg-icons'
+import dompurify from 'dompurify'
 
 import colors from '../colors'
 
@@ -63,7 +63,15 @@ export default function MessageTable({viewState}) {
         border-bottom: 1px solid ${colors.backgroundActive};
         
         &:first-child {
+          margin-top: 2rem;
+          height: 1.5rem;
+          
+          font-size: .75rem;
+          font-weight: bold;          
+          color: ${colors.foregroundSecondary};
+
           border-top: 1px solid ${colors.backgroundActive};
+          border-bottom: 2px solid ${colors.backgroundActive};          
         }
         
         &:hover {
@@ -71,25 +79,26 @@ export default function MessageTable({viewState}) {
           cursor: pointer;
         }
         
-        .email {
-          width: 14rem;
-          max-width: 14rem;
-          white-space: nowrap;
-          overflow: hidden;
-        }
-        
+        .email,
         .subject,
         .attachment,
         .received {
           margin: auto;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .email {
+          max-width: 12rem;
         }
         
         .subject {
-          width: 100%;
-          max-width: 100%;
-          
-          white-space: nowrap;
-          overflow: hidden;
+          span {
+            color: ${colors.foregroundSecondary};
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+          }
         }
         
         .attachment {
@@ -183,19 +192,33 @@ export default function MessageTable({viewState}) {
       </div>
 
       <div className="messages">
+        <Row className="row" onClick={() => viewState.chooseMessage(m)}>
+          <Col className="email">
+            Receiver
+          </Col>
+          <Col className="email">
+            Sender
+          </Col>
+          <Col className="subject">
+            Subject - Content
+          </Col>
+          <Col className="attachment">
+          </Col>
+          <Col className="received">
+            Date
+          </Col>
+        </Row>
         {
           viewState.pagedMessages && viewState.pagedMessages.content && viewState.pagedMessages.content.map(m => (
             <Row className="row" onClick={() => viewState.chooseMessage(m)}>
               <Col className="email">
-                <ItemEmail sentFrom={m.sentFrom}
-                           receivedTo={m.receivedTo}
-                           receivedCc={m.receivedCc}
-                           receivedBcc={m.receivedBcc}/>
+                <ItemReceiver receivedTo={m.receivedTo} receivedCc={m.receivedCc} receivedBcc={m.receivedBcc}/>
+              </Col>
+              <Col className="email">
+                <ItemSender sentFrom={m.sentFrom}/>
               </Col>
               <Col className="subject">
-                <ItemSubjectContent subject={m.subject}
-                                    plainContent={m.plainContent}
-                                    htmlContent={m.htmlContent}/>
+                <ItemSubjectContent subject={m.subject} plainContent={m.plainContent} htmlContent={m.htmlContent}/>
               </Col>
               <Col className="attachment">
                 <ItemAttachment attachments={m.attachments}/>
@@ -211,54 +234,28 @@ export default function MessageTable({viewState}) {
   )
 }
 
-function ItemEmail({
-  sentFrom,
+function ItemSender({
+  sentFrom
+}) {
+  const fromList = sentFrom && sentFrom.filter(item => item.address).map(item => item.address.displayName || item.address.email)
+
+  return (<>
+    {fromList.join(', ')}
+  </>)
+}
+
+function ItemReceiver({
   receivedTo,
   receivedCc,
   receivedBcc
 }) {
-  const style = css`
-    .sender,
-    .receiver {
-      font-size: .9rem;
-    }
-    
-    .sender {
-      margin-bottom: -4px;
-      color: #202124;
-    }
-    
-    .receiver {
-      color: #5f6368;
-      
-      .arrow {
-        margin-left: .5rem;
-        margin-right: .25rem;
-        width: .9rem;
-        height: .9rem;
-        
-        transform: rotate(180deg);
-      }
-    }
-  `
-
-  const fromList = sentFrom && sentFrom.filter(item => item.address).map(item => item.address.displayName || item.address.email)
   const toList = receivedTo && receivedTo.filter(item => item.address).map(item => item.address.displayName || item.address.email)
   const ccList = receivedCc && receivedCc.filter(item => item.address).map(item => item.address.displayName || item.address.email)
   const bccList = receivedBcc && receivedBcc.filter(item => item.address).map(item=> item.address.displayName || item.address.email)
 
-  return (
-    <div css={style}>
-      <div className="sender">
-        {fromList.join(', ')}
-      </div>
-      <div className="receiver">
-        <ReplyIcon size={14} className="arrow"/>
-        {/*<FontAwesomeIcon icon={faTurnUp} className="arrow"/>*/}
-        {toList.concat(ccList).concat(bccList).join(', ')}
-      </div>
-    </div>
-  )
+  return (<>
+    {toList.concat(ccList).concat(bccList).join(', ')}
+  </>)
 }
 
 function ItemLocalDateTime({dateTime}) {
@@ -284,29 +281,9 @@ function ItemAttachment({attachments}) {
 }
 
 function ItemSubjectContent({subject, plainContent, htmlContent}) {
-  const style =css`
-    .subject {
-      color: #202124;
-    }
-    
-    .content,
-    .content::before {
-      color: #5f6368;
-    }
-    
-    .content::before {
-      content: ' - ';
-    }
-  `
-
-  return (
-    <div css={style}>
-      <span className="subject">
-        {subject}
-      </span>
-      <span className="content">
-        {plainContent || htmlContent}
-      </span>
-    </div>
-  )
+  const content = dompurify.sanitize(htmlContent || plainContent, {ALLOWED_TAGS: ['#text']})
+  return (<>
+    {subject}
+    <span>{content && ` - ${content}`}</span>
+  </>)
 }
