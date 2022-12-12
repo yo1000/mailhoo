@@ -9,6 +9,9 @@ Mailhoo is a SMTP server for development inspired by [MailHog](https://github.co
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 
+![Mailbox1](docs/screenshot-mailbox1.png)
+
+![Mailbox2](docs/screenshot-mailbox2.png)
 
 How to run
 ----------
