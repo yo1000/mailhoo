@@ -2,8 +2,10 @@ mailhoo:
   smtp.port: 1025
   web.allowed-origins:
   data.jpa.table-name-prefix:
-
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     url: jdbc:h2:mem:mailhoo
     hikari:

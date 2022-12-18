@@ -1,19 +1,20 @@
 import React from "react";
 import {css} from "@emotion/react";
-import {Row, Col, Button, ButtonGroup, ButtonToolbar} from "react-bootstrap";
+import {Button, ButtonGroup, ButtonToolbar, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFile, faRotateRight} from '@fortawesome/free-solid-svg-icons'
 import dompurify from 'dompurify'
 
 import colors from '../colors'
+import {NavLink, useLocation, useNavigate} from "react-router-dom";
 
 /**
  *
- * @param {ViewState} viewState
+ * @param page
  * @returns {JSX.Element}
  * @constructor
  */
-export default function MessageTable({viewState}) {
+export default function MessageTable({page}) {
   const style = css`
     .mutex.lock {
       cursor: not-allowed;
@@ -142,45 +143,50 @@ export default function MessageTable({viewState}) {
     return a
   }
 
+  const navigate = useNavigate()
+  const location = useLocation()
+  const basePath = location.pathname.replace(/\/[0-9]+$/, '')
+
   return (
     <div css={style}>
       <div className="header">
         <Row>
           <Col className="reload mutex">
-            <Button variant="outline-secondary" onClick={() => viewState.renderWithUpdateDomains({})}>
+            <Button variant="outline-secondary" onClick={() =>
+              navigate(location.pathname)
+            }>
               <FontAwesomeIcon icon={faRotateRight}/> Reload
             </Button>
           </Col>
           <Col className="paginator mutex">
             {
-              (viewState.pagedMessages && viewState.pagedMessages.totalPages)
+              (page && page.totalPages)
                 ? (
                 <ButtonToolbar>
                   {
-                    (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number > 4) && (
+                    (page.totalPages >= 14) && (page.number > 4) && (
                       <ButtonGroup className="me-2">
-                        <Button variant="outline-secondary" onClick={
-                          () => viewState.render({n: 0})
-                        }>{1}</Button>
+                        <NavLink className={({isActive}) =>
+                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
+                        } to={`${basePath}/${0}`}>{1}</NavLink>
                       </ButtonGroup>
                     )
                   }
                   <ButtonGroup className="me-2">
                     {
-                      createPaginatorIndexes(viewState.pagedMessages.number, viewState.pagedMessages.totalPages).map(i => (
-                        <Button variant="outline-secondary"
-                                className={i === viewState.pagedMessages.number && 'active current'} onClick={
-                          () => viewState.render({n: i})
-                        }>{i + 1}</Button>
+                      createPaginatorIndexes(page.number, page.totalPages).map((i, index) => (
+                        <NavLink key={`pageNumber-${index}`} className={({isActive}) =>
+                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
+                        } to={`${basePath}/${i}`}>{i + 1}</NavLink>
                       ))
                     }
                   </ButtonGroup>
                   {
-                    (viewState.pagedMessages.totalPages >= 14) && (viewState.pagedMessages.number + 5 < viewState.pagedMessages.totalPages) && (
+                    (page.totalPages >= 14) && (page.number + 5 < page.totalPages) && (
                       <ButtonGroup className="me-2">
-                        <Button variant="outline-secondary" onClick={
-                          () => viewState.render({n: viewState.pagedMessages.totalPages - 1})
-                        }>{viewState.pagedMessages.totalPages}</Button>
+                        <NavLink className={({isActive}) =>
+                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
+                        } to={`${basePath}/${page.totalPages - 1}`}>{page.totalPages}</NavLink>
                       </ButtonGroup>
                     )
                   }
@@ -192,7 +198,7 @@ export default function MessageTable({viewState}) {
       </div>
 
       <div className="messages">
-        <Row className="row" onClick={() => viewState.chooseMessage(m)}>
+        <Row className="row">
           <Col className="email">
             Receiver
           </Col>
@@ -209,8 +215,10 @@ export default function MessageTable({viewState}) {
           </Col>
         </Row>
         {
-          viewState.pagedMessages && viewState.pagedMessages.content && viewState.pagedMessages.content.map(m => (
-            <Row className="row" onClick={() => viewState.chooseMessage(m)}>
+          page && page.content && page.content.map((m, index) => (
+            <Row key={`pageContent-${index}`} className="row" onClick={() =>
+              navigate(`../m/${m.id}`)
+            }>
               <Col className="email">
                 <ItemReceiver receivedTo={m.receivedTo} receivedCc={m.receivedCc} receivedBcc={m.receivedBcc}/>
               </Col>

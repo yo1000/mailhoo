@@ -3,6 +3,7 @@ package com.yo1000.mailhoo
 import com.sun.mail.handlers.*
 import com.yo1000.mailhoo.infrastructure.TableNameStrategy
 import org.hibernate.internal.log.`ConnectionAccessLogger_$logger`
+import org.hibernate.type.TextType
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -51,6 +52,7 @@ import java.util.*
 		text_html::class,
 		text_plain::class,
 		text_xml::class,
+		TextType::class,
 		`ConnectionAccessLogger_$logger`::class,
 		MailhooConfigurationProperties::class,
 		MailhooConfigurationProperties.Smtp::class,

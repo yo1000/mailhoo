@@ -1,16 +1,16 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {css} from "@emotion/react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faInbox, faAt} from '@fortawesome/free-solid-svg-icons'
 import colors from "../colors";
+import {useLocation, useNavigate} from "react-router-dom";
 
 /**
  *
- * @param {ViewState} viewState
  * @returns {JSX.Element}
  * @constructor
  */
-export default function DomainList({viewState}) {
+export default function DomainList() {
   const style = css`
     .mutex.lock {
       cursor: not-allowed;
@@ -54,15 +54,40 @@ export default function DomainList({viewState}) {
     }
   `
 
+  const navigate = useNavigate()
+  const location = useLocation()
+  const basePath = location.pathname.replace(/\/[pm]\/.+$/, '')
+
+  const [fromDomains, setFromDomains] = useState()
+  const [toDomains, setToDomains] = useState()
+  const [ccDomains, setCcDomains] = useState()
+  const [bccDomains, setBccDomains] = useState()
+
+  useEffect(() => {
+    const API_BASE_URL = process.env.API_BASE_URL
+
+    fetch(`${API_BASE_URL}/domains/from`)
+      .then(resp => resp.json())
+      .then(domains => setFromDomains(domains))
+
+    fetch(`${API_BASE_URL}/domains/to`)
+      .then(resp => resp.json())
+      .then(domains => setToDomains(domains))
+
+    fetch(`${API_BASE_URL}/domains/cc`)
+      .then(resp => resp.json())
+      .then(domains => setCcDomains(domains))
+
+    fetch(`${API_BASE_URL}/domains/bcc`)
+      .then(resp => resp.json())
+      .then(domains => setBccDomains(domains))
+  }, [location])
+
   return (
     <div css={style}>
       <ul className="mutex">
-        <li className="current" onClick={(event) => {
-          viewState.updateMessages(null, null,
-            `${viewState.API_BASE_URL}/messages?all`,
-            { list: 'all', number: null, dir: null },
-            () => { viewState.activateDomainFilterStyle(event) }
-          )
+        <li className={basePath === '' ? 'current' : ''} onClick={(event) => {
+          navigate('/')
         }}>
           <FontAwesomeIcon icon={faInbox}/>
           Inbox
@@ -71,10 +96,9 @@ export default function DomainList({viewState}) {
       <h3>From</h3>
       <ul className="mutex">
         {
-          viewState.fromDomains && viewState.fromDomains.map(d => (
-            <li onClick={(event) => {
-              viewState.render({n: 'max', dir:'prev', filter: {from: d}})
-              viewState.activateDomainFilterStyle(event)
+          fromDomains && fromDomains.map((d, index) => (
+            <li key={`fromDomains-${index}`} className={basePath === `/domains/from/${d}` ? 'current' : ''} onClick={(event) => {
+              navigate(`/domains/from/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -85,10 +109,9 @@ export default function DomainList({viewState}) {
       <h3>To</h3>
       <ul className="mutex">
         {
-          viewState.toDomains && viewState.toDomains.map(d => (
-            <li onClick={(event) => {
-              viewState.render({n: 'max', dir:'prev', filter: {to: d}})
-              viewState.activateDomainFilterStyle(event)
+          toDomains && toDomains.map((d, index) => (
+            <li key={`toDomains-${index}`} className={basePath === `/domains/to/${d}` ? 'current' : ''} onClick={(event) => {
+              navigate(`/domains/to/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -99,10 +122,9 @@ export default function DomainList({viewState}) {
       <h3>Cc</h3>
       <ul className="mutex">
         {
-          viewState.ccDomains && viewState.ccDomains.map(d => (
-            <li onClick={(event) => {
-              viewState.render({n: 'max', dir:'prev', filter: {cc: d}})
-              viewState.activateDomainFilterStyle(event)
+          ccDomains && ccDomains.map((d, index) => (
+            <li key={`ccDomains-${index}`} className={basePath === `/domains/cc/${d}` ? 'current' : ''} onClick={(event) => {
+              navigate(`/domains/cc/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}
@@ -113,10 +135,9 @@ export default function DomainList({viewState}) {
       <h3>Bcc</h3>
       <ul className="mutex">
         {
-          viewState.bccDomains && viewState.bccDomains.map(d => (
-            <li onClick={(event) => {
-              viewState.render({n: 'max', dir:'prev', filter: {bcc: d}})
-              viewState.activateDomainFilterStyle(event)
+          bccDomains && bccDomains.map((d, index) => (
+            <li key={`bccDomains-${index}`} className={basePath === `/domains/bcc/${d}` ? 'current' : ''} onClick={(event) => {
+              navigate(`/domains/bcc/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
               {d}

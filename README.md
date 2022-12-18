@@ -49,7 +49,7 @@ docker run \
 
 The following other databases are available.
 
-| Database     | JDBC Url example                               |
+| Database     | JDBC Connection URL example                    |
 |:-------------|:-----------------------------------------------|
 | H2 (default) | jdbc:h2:mem:mailhoo                            |
 | PoasgreSQL   | jdbc:postgresql://{containerName}:5432/mailhoo |
@@ -59,7 +59,9 @@ The following other databases are available.
 ### Run with native image
 
 ```shell
-curl -L -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.1.0/mailhoo-linux && \
+VERSION=1.1.1
+curl -L -o mailhoo "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-linux" && \
+chmod +x mailhoo
 ./mailhoo
 ```
 
@@ -68,7 +70,8 @@ curl -L -o mailhoo https://github.com/yo1000/mailhoo/releases/download/1.1.0/mai
 See "Build Requirements" below for build requirements.
 
 ```shell
-curl -L -o mailhoo.jar https://github.com/yo1000/mailhoo/releases/download/1.1.0/mailhoo-1.1.0.jar && \
+VERSION=1.1.1
+curl -L -o mailhoo.jar "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-${VERSION}.jar" && \
 java -jar mailhoo.jar
 ```
 
@@ -92,6 +95,15 @@ npx webpack serve &
 
 open http://localhost:8081
 ```
+
+### Main environment variables
+
+| Name                               | Note                                             |
+|:-----------------------------------|:-------------------------------------------------|
+| `SPRING_DATASOURCE_URL`            | JDBC Connection URL to database.                 |
+| `SPRING_DATASOURCE_USERNAME`       | Database Connection username.                    |
+| `SPRING_DATASOURCE_PASSWORD`       | Database Connection password.                    |
+| `MAILHOO_DATA_JPA_TABLENAMEPREFIX` | Prefix for naming of table that stores messages. |
 
 
 Build Requirements

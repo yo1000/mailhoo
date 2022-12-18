@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
@@ -25,6 +26,20 @@ class WebConfig(
                         .addMapping("/**")
                         .allowedOrigins(*it.toTypedArray())
                 }
+            }
+
+            override fun addViewControllers(registry: ViewControllerRegistry) {
+                registry
+                    .addViewController("/")
+                    .setViewName("forward:/index.html")
+
+                registry
+                    .addViewController("/{spring:\\w+}")
+                    .setViewName("forward:/")
+
+                registry
+                    .addViewController("/**/{spring:\\w+}")
+                    .setViewName("forward:/")
             }
         }
     }

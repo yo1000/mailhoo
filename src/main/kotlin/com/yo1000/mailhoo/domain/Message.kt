@@ -1,5 +1,6 @@
 package com.yo1000.mailhoo.domain
 
+import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 
@@ -33,10 +34,13 @@ data class Message(
     @JoinColumn
     var receivedBcc: Set<ReceivedBcc>,
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     val subject: String?,
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     val plainContent: String?,
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     val htmlContent: String?,
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
@@ -44,6 +48,7 @@ data class Message(
     val sentDate: Date,
     val receivedDate: Date,
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     val headers: String,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn

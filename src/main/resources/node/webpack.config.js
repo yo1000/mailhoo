@@ -46,6 +46,9 @@ module.exports = {
       directory: path.join(__dirname, '../public'),
     },
     allowedHosts: 'all',
+    historyApiFallback: {
+      disableDotRule: true,
+    },
     port: process.env.PORT ? process.env.PORT : 'auto',
   },
 }

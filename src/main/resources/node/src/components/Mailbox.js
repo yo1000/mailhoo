@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from "react";
 import {css} from "@emotion/react";
-import {Row, Col, Stack, Form, InputGroup} from "react-bootstrap";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {Col, Row, Stack} from "react-bootstrap";
 import {MarkGithubIcon} from '@primer/octicons-react'
 
 import DomainList from "./DomainList";
 import MessageTable from "./MessageTable"
 import MessageDetails from "./MessageDetails"
 import Logo from "./Logo"
-import ViewState from "../ViewState";
 import colors from "../colors"
+import SearchBox from "./SearchBox";
+import {Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
 
 export default function Mailbox() {
   const style = css`
@@ -34,48 +33,6 @@ export default function Mailbox() {
       li {
         pointer-events: none;
         color: ${colors.foregroundSecondary};
-      }
-    }
-    
-    .search form {
-      margin-top: -7px;
-      
-      .form-select {
-        max-width: 10rem;
-        padding-left: 1.75rem;
-        border-right: 0;
-      }
-      
-      input {
-        &::placeholder {
-          color: ${colors.foregroundSecondary};
-        }
-        
-        &:-internal-autofill-selected,
-        &:-internal-autofill-selected:focus {
-          -webkit-box-shadow: 0 0 0px 10rem ${colors.background} inset;
-        }
-      }
-      
-      .form-select:focus,
-      input:focus {
-        border-color: ${colors.formControl.backgroundActive};
-        box-shadow: 0 0 0 0.25rem rgb(108 117 125 / 50%);
-      }
-      
-      svg {
-        position: absolute;
-        top: .75rem;
-        left: .75rem;
-        z-index: 10;
-        color: ${colors.foregroundSecondary};
-      }
-      
-      &.hidden {
-        svg,
-        input::placeholder {
-          opacity: 0;
-        }
       }
     }
     
@@ -103,75 +60,20 @@ export default function Mailbox() {
     }
   `
 
-  const viewState = new ViewState({
-    initializedState: useState(false),
-    fromDomainsState: useState(),
-    toDomainsState: useState(),
-    ccDomainsState: useState(),
-    bccDomainsState: useState(),
-    pagedMessagesState: useState(),
-    messageDetailsState: useState(),
-    viewConditionState: useState()
-  })
-
-  const focusSearch = () => {
-    document.querySelectorAll('.search form').forEach(elm => {
-      elm.classList.add('hidden')
-    })
-  }
-
-  const blurSearch = () => {
-    const q = document.getElementById('searchQuery').value
-    document.querySelectorAll('.search form').forEach(elm => {
-      if (!q) {
-        elm.classList.remove('hidden')
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (!viewState.initialized) {
-      viewState.renderWithUpdateDomains({})
-      viewState.setInitialized(true)
-    }
-  })
-
   return (
     <div css={style}>
       <Row>
         <Col className="sidebar" sm={2}>
           <Logo/>
-          <DomainList viewState={viewState}/>
+          <Routes>
+            <Route path="*" element={<DomainList/>}/>
+          </Routes>
         </Col>
         <Col className="main-contents" sm={10}>
           <Stack>
             <Row>
               <Col className="search">
-                <Form onSubmit={(event) => {
-                  event.preventDefault()
-                  const q = document.getElementById('searchQuery').value
-                  const f = document.getElementById('searchField').value
-                  viewState.updateMessages(null, null,
-                    `${viewState.API_BASE_URL}/messages/search?q=${q}&f=${f}`,
-                    { listBySearchQuery: { q: q, f: f }, number: null, dir: null },
-                    () => { viewState.deactivateDomainFilterStyle() }
-                  )
-                }}>
-                  <InputGroup className="mb-3">
-                    <Form.Select id="searchField">
-                      <option value="subject">Subject</option>
-                      <option value="content">Content</option>
-                      <option value="from">From</option>
-                      <option value="to">To</option>
-                      <option value="cc">Cc</option>
-                      <option value="bcc">Bcc</option>
-                      <option value="attachment">Attachment</option>
-                    </Form.Select>
-                    <FontAwesomeIcon icon={faMagnifyingGlass}/>
-                    <Form.Control type="text" placeholder="Search mail"
-                                  id="searchQuery"/>
-                  </InputGroup>
-                </Form>
+                <SearchBox/>
               </Col>
               <Col className="github">
                 <a href="https://github.com/yo1000/mailhoo" target="_blank" rel="noopener noreferrer">
@@ -181,10 +83,23 @@ export default function Mailbox() {
             </Row>
             <Row>
               <Col sm={12} className="messageTableContainer">
-                {
-                  viewState.isDetailsView() ? (<MessageDetails viewState={viewState}/>) :
-                    viewState.isListView() ? (<MessageTable viewState={viewState}/>) : <></>
-                }
+                <Routes>
+                  <Route path="/domains/:filterType/:filterValue">
+                    <Route path="p/:p" element={<FilteredMessageTable/>}/>
+                    <Route path="m/:id" element={<SelectedMessageDetails/>}/>
+                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                  </Route>
+                  <Route path="/search/:queryType/:queryValue">
+                    <Route path="p/:p" element={<QueriedMessageTable/>}/>
+                    <Route path="m/:id" element={<SelectedMessageDetails/>}/>
+                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                  </Route>
+                  <Route path="/">
+                    <Route path="p/:p" element={<InboxMessageTable/>}/>
+                    <Route path="m/:id" element={<SelectedMessageDetails/>}/>
+                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                  </Route>
+                </Routes>
               </Col>
             </Row>
           </Stack>
@@ -192,4 +107,95 @@ export default function Mailbox() {
       </Row>
     </div>
   )
+}
+
+function InboxMessageTable() {
+  const {p} = useParams()
+  const location = useLocation()
+  const [page, setPage] = useState()
+
+  useEffect(() => {
+    async function fetchPage() {
+      const API_BASE_URL = process.env.API_BASE_URL
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+
+      await fetch(`${API_BASE_URL}/messages?all&${pageQuery}`)
+        .then(resp => resp.json())
+        .then(pageResp => {
+          setPage(pageResp)
+        })
+    }
+
+    fetchPage()
+  }, [location])
+
+  return <MessageTable page={page}/>
+}
+
+function FilteredMessageTable() {
+  const {filterType, filterValue, p} = useParams()
+  const location = useLocation()
+  const [page, setPage] = useState()
+
+  useEffect(() => {
+    async function fetchPage() {
+      const API_BASE_URL = process.env.API_BASE_URL
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+
+      await fetch(`${API_BASE_URL}/messages?${filterType}Domain=${filterValue}&${pageQuery}`)
+        .then(resp => resp.json())
+        .then(pageResp => {
+          setPage(pageResp)
+        })
+    }
+
+    fetchPage()
+  }, [location])
+
+  return <MessageTable page={page}/>
+}
+
+function QueriedMessageTable() {
+  const {queryType, queryValue, p} = useParams()
+  const location = useLocation()
+  const [page, setPage] = useState()
+
+  useEffect(() => {
+    async function fetchPage() {
+      const API_BASE_URL = process.env.API_BASE_URL
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+
+      await fetch(`${API_BASE_URL}/messages/search?f=${queryType}&q=${queryValue}&${pageQuery}`)
+        .then(resp => resp.json())
+        .then(pageResp => {
+          setPage(pageResp)
+        })
+    }
+
+    fetchPage()
+  }, [location])
+
+  return <MessageTable page={page}/>
+}
+
+function SelectedMessageDetails() {
+  const {id} = useParams()
+  const location = useLocation()
+  const [message, setMessage] = useState()
+
+  useEffect(() => {
+    async function fetchMessage() {
+      const API_BASE_URL = process.env.API_BASE_URL
+
+      await fetch(`${API_BASE_URL}/messages/${id}`)
+        .then(resp => resp.json())
+        .then(messageResp => {
+          setMessage(messageResp)
+        })
+    }
+
+    fetchMessage()
+  }, [location])
+
+  return <MessageDetails message={message}/>
 }

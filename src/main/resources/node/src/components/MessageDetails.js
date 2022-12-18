@@ -1,19 +1,20 @@
 import React, {useState} from "react";
 import {css} from "@emotion/react";
-import {Row, Col, ButtonGroup, ToggleButton, Button} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Row, ToggleButton} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faArrowLeft, faFileArrowDown} from '@fortawesome/free-solid-svg-icons'
 import dompurify from 'dompurify'
 
 import colors from "../colors"
+import {useNavigate} from "react-router-dom";
 
 /**
  *
- * @param {ViewState} viewState
+ * @param message
  * @returns {JSX.Element}
  * @constructor
  */
-export default function MessageDetails({viewState}) {
+export default function MessageDetails({message}) {
   const style = css`
     h2 {
       font-size: 1.5rem;
@@ -118,17 +119,19 @@ export default function MessageDetails({viewState}) {
     { name: 'Headers', value: '3' },
   ]
 
-  const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value);
+  const API_BASE_URL = process.env.API_BASE_URL
+  const navigate = useNavigate()
+  const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value)
 
   return (<>
     <Button variant="outline-secondary" onClick={() => {
-      viewState.setMessageDetails(null)
+      navigate(-1)
     }}>
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
     <div css={style}>
-      <h2>{viewState.messageDetails.subject}</h2>
+      <h2>{message && message.subject}</h2>
       <Row>
         <Col sm={8}>
           <table className="addresses">
@@ -136,36 +139,36 @@ export default function MessageDetails({viewState}) {
             <tr>
               <th>From:</th>
               <td><ul>{
-                viewState.messageDetails.sentFrom.map(item => item.address.displayName
-                  ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li><b>{item.address.email}</b></li>)
+                message && message.sentFrom.map((item, index) => item.address.displayName
+                  ? (<li key={`sentFrom-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`sentFrom-${index}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>To:</th>
               <td><ul>{
-                viewState.messageDetails.receivedTo.map(item => item.address.displayName
-                  ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li><b>{item.address.email}</b></li>)
+                message && message.receivedTo.map((item, index) => item.address.displayName
+                  ? (<li key={`receivedTo-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedTo-${index}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>Cc:</th>
               <td><ul>{
-                viewState.messageDetails.receivedCc.map(item => item.address.displayName
-                  ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li><b>{item.address.email}</b></li>)
+                message && message.receivedCc.map((item, index) => item.address.displayName
+                  ? (<li key={`receivedCc-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedCc-${index}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>Bcc:</th>
               <td><ul>{
-                viewState.messageDetails.receivedBcc.map(item => item.address.displayName
-                  ? (<li><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li><b>{item.address.email}</b></li>)
+                message && message.receivedBcc.map((item, index) => item.address.displayName
+                  ? (<li key={`receivedBcc-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedBcc-${index}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
@@ -178,13 +181,13 @@ export default function MessageDetails({viewState}) {
             <tr>
               <th>Sent:</th>
               <td>
-                <DetailsLocalDateTime dateTime={viewState.messageDetails.sentDate}/>
+                {message && <DetailsLocalDateTime dateTime={message.sentDate}/>}
               </td>
             </tr>
             <tr>
               <th>Received:</th>
               <td>
-                <DetailsLocalDateTime dateTime={viewState.messageDetails.receivedDate}/>
+                {message && <DetailsLocalDateTime dateTime={message.receivedDate}/>}
               </td>
             </tr>
             </tbody>
@@ -192,10 +195,10 @@ export default function MessageDetails({viewState}) {
         </Col>
       </Row>
 
-      {viewState.messageDetails.attachments && viewState.messageDetails.attachments.length ? (
+      {message && message.attachments && message.attachments.length ? (
         <ul className="attachments">
-          {viewState.messageDetails.attachments.map(item => (
-            <li><a href={`${viewState.API_BASE_URL}/messages/${viewState.messageDetails.id}/attachments/${item.fileName}`}>
+          {message.attachments.map((item, index) => (
+            <li key={`attachment-${index}`}><a href={`${API_BASE_URL}/messages/${message.id}/attachments/${item.fileName}`}>
               <FontAwesomeIcon icon={faFileArrowDown}/>
               {item.fileName}
             </a></li>
@@ -206,7 +209,7 @@ export default function MessageDetails({viewState}) {
       <ButtonGroup>
         {CONTENT_VIEW_TYPES.map((contentViewType, index) => (
           <ToggleButton
-            key={index}
+            key={`toggle-${index}`}
             id={`content-view-type-${contentViewType.value}`}
             type="radio"
             variant="outline-secondary"
@@ -224,14 +227,14 @@ export default function MessageDetails({viewState}) {
     {
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value
         ? (<div dangerouslySetInnerHTML={{__html: dompurify
-            .sanitize(viewState.messageDetails.htmlContent)
+            .sanitize(message ? message.htmlContent : '')
             .replace(/href/g, "target='_blank' rel='noopener noreferrer' href")
             .replace(/target=["']?[a-zA-Z_]*["']?/g, "target='_blank'")
         }}/>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value
-        ? (<pre>{viewState.messageDetails.plainContent}</pre>) :
+        ? (<pre>{message && message.plainContent}</pre>) :
       getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HEADERS].value
-        ? (<code css={styleHeaders}><pre>{viewState.messageDetails.headers}</pre></code>)
+        ? (<code css={styleHeaders}><pre>{message && message.headers}</pre></code>)
         : (<></>)
     }
     </div>
