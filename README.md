@@ -59,7 +59,7 @@ The following other databases are available.
 ### Run with native image
 
 ```shell
-VERSION=1.1.1
+VERSION=1.2.0
 curl -L -o mailhoo "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-linux" && \
 chmod +x mailhoo
 ./mailhoo
@@ -70,7 +70,7 @@ chmod +x mailhoo
 See "Build Requirements" below for build requirements.
 
 ```shell
-VERSION=1.1.1
+VERSION=1.2.0
 curl -L -o mailhoo.jar "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-${VERSION}.jar" && \
 java -jar mailhoo.jar
 ```
