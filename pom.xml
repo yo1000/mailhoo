@@ -238,11 +238,6 @@
 					<!-- optional: where to download node and npm from. Defaults to https://nodejs.org/dist/ -->
 					<!--<downloadRoot>https://nodejs.org/dist/</downloadRoot>-->
 
-					<!-- optional: The default argument is actually
-					"install", so unless you need to run some other npm command,
-					you can remove this whole <configuration> section. -->
-					<!--<arguments>install</arguments>-->
-
 					<workingDirectory>src/main/resources/node</workingDirectory>
 				</configuration>
 			</plugin>
