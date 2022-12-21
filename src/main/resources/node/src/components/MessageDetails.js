@@ -123,16 +123,8 @@ export default function MessageDetails({message}) {
   const navigate = useNavigate()
   const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value)
 
-  const navigateToBack = () => {
-    navigate(-1)
-  }
-
-  const toggleContentView = (event) => {
-    setContentViewTypeValue(event.target.value)
-  }
-
   return (<>
-    <Button variant="outline-secondary" onClick={navigateToBack}>
+    <Button variant="outline-secondary" onClick={() => navigate(-1)}>
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
@@ -222,7 +214,7 @@ export default function MessageDetails({message}) {
             name="radio"
             value={contentViewType.value}
             checked={getContentViewTypeValue === contentViewType.value}
-            onChange={toggleContentView}
+            onChange={(event) => setContentViewTypeValue(event.target.value)}
           >
             {contentViewType.name}
           </ToggleButton>
