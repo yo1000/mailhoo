@@ -174,8 +174,8 @@ export default function MessageTable({page}) {
                   }
                   <ButtonGroup className="me-2">
                     {
-                      createPaginatorIndexes(page.number, page.totalPages).map((i, index) => (
-                        <NavLink key={`pageNumber-${index}`} className={({isActive}) =>
+                      createPaginatorIndexes(page.number, page.totalPages).map((i) => (
+                        <NavLink key={`pageNumber-${i}`} className={({isActive}) =>
                           `btn btn-outline-secondary ${isActive ? 'current' : ''}`
                         } to={`${basePath}/${i}`}>{i + 1}</NavLink>
                       ))
@@ -215,8 +215,8 @@ export default function MessageTable({page}) {
           </Col>
         </Row>
         {
-          page && page.content && page.content.map((m, index) => (
-            <Row key={`pageContent-${index}`} className="row" onClick={() =>
+          page && page.content && page.content.map((m) => (
+            <Row key={`pageContent-${m.id}`} className="row" onClick={() =>
               navigate(`../m/${m.id}`)
             }>
               <Col className="email">

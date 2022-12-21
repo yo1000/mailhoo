@@ -96,8 +96,8 @@ export default function DomainList() {
       <h3>From</h3>
       <ul className="mutex">
         {
-          fromDomains && fromDomains.map((d, index) => (
-            <li key={`fromDomains-${index}`} className={basePath === `/domains/from/${d}` ? 'current' : ''} onClick={(event) => {
+          fromDomains && fromDomains.map((d) => (
+            <li key={`fromDomains-${d}`} className={basePath === `/domains/from/${d}` ? 'current' : ''} onClick={(event) => {
               navigate(`/domains/from/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
@@ -109,8 +109,8 @@ export default function DomainList() {
       <h3>To</h3>
       <ul className="mutex">
         {
-          toDomains && toDomains.map((d, index) => (
-            <li key={`toDomains-${index}`} className={basePath === `/domains/to/${d}` ? 'current' : ''} onClick={(event) => {
+          toDomains && toDomains.map((d) => (
+            <li key={`toDomains-${d}`} className={basePath === `/domains/to/${d}` ? 'current' : ''} onClick={(event) => {
               navigate(`/domains/to/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
@@ -122,8 +122,8 @@ export default function DomainList() {
       <h3>Cc</h3>
       <ul className="mutex">
         {
-          ccDomains && ccDomains.map((d, index) => (
-            <li key={`ccDomains-${index}`} className={basePath === `/domains/cc/${d}` ? 'current' : ''} onClick={(event) => {
+          ccDomains && ccDomains.map((d) => (
+            <li key={`ccDomains-${d}`} className={basePath === `/domains/cc/${d}` ? 'current' : ''} onClick={(event) => {
               navigate(`/domains/cc/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>
@@ -135,8 +135,8 @@ export default function DomainList() {
       <h3>Bcc</h3>
       <ul className="mutex">
         {
-          bccDomains && bccDomains.map((d, index) => (
-            <li key={`bccDomains-${index}`} className={basePath === `/domains/bcc/${d}` ? 'current' : ''} onClick={(event) => {
+          bccDomains && bccDomains.map((d) => (
+            <li key={`bccDomains-${d}`} className={basePath === `/domains/bcc/${d}` ? 'current' : ''} onClick={(event) => {
               navigate(`/domains/bcc/${d}`)
             }}>
               <FontAwesomeIcon icon= {faAt}/>

@@ -123,10 +123,16 @@ export default function MessageDetails({message}) {
   const navigate = useNavigate()
   const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value)
 
+  const navigateToBack = () => {
+    navigate(-1)
+  }
+
+  const toggleContentView = (event) => {
+    setContentViewTypeValue(event.target.value)
+  }
+
   return (<>
-    <Button variant="outline-secondary" onClick={() => {
-      navigate(-1)
-    }}>
+    <Button variant="outline-secondary" onClick={navigateToBack}>
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
@@ -139,36 +145,36 @@ export default function MessageDetails({message}) {
             <tr>
               <th>From:</th>
               <td><ul>{
-                message && message.sentFrom.map((item, index) => item.address.displayName
-                  ? (<li key={`sentFrom-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li key={`sentFrom-${index}`}><b>{item.address.email}</b></li>)
+                message && message.sentFrom.map((item) => item.address.displayName
+                  ? (<li key={`sentFrom-${item.address.email}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`sentFrom-${item.address.email}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>To:</th>
               <td><ul>{
-                message && message.receivedTo.map((item, index) => item.address.displayName
-                  ? (<li key={`receivedTo-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li key={`receivedTo-${index}`}><b>{item.address.email}</b></li>)
+                message && message.receivedTo.map((item) => item.address.displayName
+                  ? (<li key={`receivedTo-${item.address.email}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedTo-${item.address.email}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>Cc:</th>
               <td><ul>{
-                message && message.receivedCc.map((item, index) => item.address.displayName
-                  ? (<li key={`receivedCc-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li key={`receivedCc-${index}`}><b>{item.address.email}</b></li>)
+                message && message.receivedCc.map((item) => item.address.displayName
+                  ? (<li key={`receivedCc-${item.address.email}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedCc-${item.address.email}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
             <tr>
               <th>Bcc:</th>
               <td><ul>{
-                message && message.receivedBcc.map((item, index) => item.address.displayName
-                  ? (<li key={`receivedBcc-${index}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
-                  : (<li key={`receivedBcc-${index}`}><b>{item.address.email}</b></li>)
+                message && message.receivedBcc.map((item) => item.address.displayName
+                  ? (<li key={`receivedBcc-${item.address.email}`}><b>{item.address.displayName}</b><small>{item.address.email}</small></li>)
+                  : (<li key={`receivedBcc-${item.address.email}`}><b>{item.address.email}</b></li>)
                 )
               }</ul></td>
             </tr>
@@ -198,7 +204,7 @@ export default function MessageDetails({message}) {
       {message && message.attachments && message.attachments.length ? (
         <ul className="attachments">
           {message.attachments.map((item, index) => (
-            <li key={`attachment-${index}`}><a href={`${API_BASE_URL}/messages/${message.id}/attachments/${item.fileName}`}>
+            <li key={`attachment-${item.fileName}`}><a href={`${API_BASE_URL}/messages/${message.id}/attachments/${item.fileName}`}>
               <FontAwesomeIcon icon={faFileArrowDown}/>
               {item.fileName}
             </a></li>
@@ -207,16 +213,16 @@ export default function MessageDetails({message}) {
       ) : (<></>)}
 
       <ButtonGroup>
-        {CONTENT_VIEW_TYPES.map((contentViewType, index) => (
+        {CONTENT_VIEW_TYPES.map((contentViewType) => (
           <ToggleButton
-            key={`toggle-${index}`}
+            key={`toggle-${contentViewType.value}`}
             id={`content-view-type-${contentViewType.value}`}
             type="radio"
             variant="outline-secondary"
             name="radio"
             value={contentViewType.value}
             checked={getContentViewTypeValue === contentViewType.value}
-            onChange={(event) => setContentViewTypeValue(event.target.value)}
+            onChange={toggleContentView}
           >
             {contentViewType.name}
           </ToggleButton>
