@@ -72,11 +72,13 @@ class MessageRestController(
         )
         pageable: Pageable,
     ): Page<Message> {
-        return getPagedMessages(
-            fromDomainName, toDomainName, ccDomainName, bccDomainName,
-            null, null, null, null, null, null, null,
-            pageable
-        )
+        return when {
+            fromDomainName != null -> messageFromRepos.findAllByParam(fromDomainName, pageable)
+            toDomainName != null -> messageToRepos.findAllByParam(toDomainName, pageable)
+            ccDomainName != null -> messageCcRepos.findAllByParam(ccDomainName, pageable)
+            bccDomainName != null -> messageBccRepos.findAllByParam(bccDomainName, pageable)
+            else -> messageRepos.findAll(pageable)
+        }
     }
 
     @GetMapping("/?seq=max")
@@ -153,47 +155,21 @@ class MessageRestController(
     ): Page<Message> {
         if (q.isEmpty()) return Page.empty()
 
-        return getPagedMessages(
-            fromDomainName = null,
-            toDomainName = null,
-            ccDomainName = null,
-            bccDomainName = null,
-            subjectQuery = if (f == "subject") q else null,
-            contentQuery = if (f == "content") q else null,
-            fromQuery = if (f == "from") q else null,
-            toQuery = if (f == "to") q else null,
-            ccQuery = if (f == "cc") q else null,
-            bccQuery = if (f == "bcc") q else null,
-            attachmentQuery = if (f == "attachment") q else null,
-            pageable = pageable
-        )
+        return when (f) {
+            "subject" -> messageSearchSubjectRepo.findAllByParam(q, pageable)
+            "content" -> messageSearchContentRepo.findAllByParam(q, pageable)
+            "from" -> messageSearchFromRepo.findAllByParam(q, pageable)
+            "to" -> messageSearchToRepo.findAllByParam(q, pageable)
+            "cc" -> messageSearchCcRepo.findAllByParam(q, pageable)
+            "bcc" -> messageSearchBccRepo.findAllByParam(q, pageable)
+            "attachment" -> messageSearchAttachmentRepo.findAllByParam(q, pageable)
+            else -> messageRepos.findAll(pageable)
+        }
     }
 
     @ExceptionHandler(NullPointerException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFound(e: Exception) {
         // NOP
-    }
-
-    private fun getPagedMessages(
-        fromDomainName: String?, toDomainName: String?, ccDomainName: String?, bccDomainName: String?,
-        subjectQuery: String?, contentQuery: String?, fromQuery: String?,
-        toQuery: String?, ccQuery: String?, bccQuery: String?, attachmentQuery: String?,
-        pageable: Pageable
-    ): Page<Message> {
-        return when {
-            fromDomainName != null -> messageFromRepos.findAllByParam(fromDomainName, pageable)
-            toDomainName != null -> messageToRepos.findAllByParam(toDomainName, pageable)
-            ccDomainName != null -> messageCcRepos.findAllByParam(ccDomainName, pageable)
-            bccDomainName != null -> messageBccRepos.findAllByParam(bccDomainName, pageable)
-            subjectQuery != null -> messageSearchSubjectRepo.findAllByParam(subjectQuery, pageable)
-            contentQuery != null -> messageSearchContentRepo.findAllByParam(contentQuery, pageable)
-            fromQuery != null -> messageSearchFromRepo.findAllByParam(fromQuery, pageable)
-            toQuery != null -> messageSearchToRepo.findAllByParam(toQuery, pageable)
-            ccQuery != null -> messageSearchCcRepo.findAllByParam(ccQuery, pageable)
-            bccQuery != null -> messageSearchBccRepo.findAllByParam(bccQuery, pageable)
-            attachmentQuery != null -> messageSearchAttachmentRepo.findAllByParam(attachmentQuery, pageable)
-            else -> messageRepos.findAll(pageable)
-        }
     }
 }
