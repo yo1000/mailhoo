@@ -222,19 +222,22 @@ export default function MessageDetails({message}) {
       </ButtonGroup>
     </div>
     <div>
-    {
-      getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value
-        ? (<div dangerouslySetInnerHTML={{__html: dompurify
-            .sanitize(message ? message.htmlContent : '')
-            .replace(/href/g, "target='_blank' rel='noopener noreferrer' href")
-            .replace(/target=["']?[a-zA-Z_]*["']?/g, "target='_blank'")
-        }}/>) :
-      getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value
-        ? (<pre>{message && message.plainContent}</pre>) :
-      getContentViewTypeValue === CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HEADERS].value
-        ? (<code css={styleHeaders}><pre>{message && message.headers}</pre></code>)
-        : (<></>)
-    }
+    { (() => {
+      switch (getContentViewTypeValue) {
+        case CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value:
+          return (<div dangerouslySetInnerHTML={{__html: dompurify
+              .sanitize(message ? message.htmlContent : '')
+              .replace(/href/g, "target='_blank' rel='noopener noreferrer' href")
+              .replace(/target=["']?[a-zA-Z_]*["']?/g, "target='_blank'")
+          }}/>)
+        case CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.PLAIN].value:
+          return (<pre>{message && message.plainContent}</pre>)
+        case CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HEADERS].value:
+          return (<code css={styleHeaders}><pre>{message && message.headers}</pre></code>)
+        default:
+          return (<></>)
+      }
+    })() }
     </div>
   </>)
 }

@@ -124,16 +124,17 @@ export default function MessageTable({page}) {
   `
 
   const createPaginatorIndexes = (currentPage, totalPages) => {
-    const start =
-      totalPages < 10 ? 0 :
-      currentPage - 4 <= 0 ? 0 :
-      currentPage + 5 > totalPages ? totalPages - 10 :
-      currentPage -4
-    const end =
-      totalPages < 10 ? totalPages :
-      currentPage - 4 <= 0 ? 10 :
-      currentPage + 5 > totalPages ? totalPages :
-      currentPage + 5
+    let start
+    if (totalPages < 10) start = 0
+    else if (currentPage - 4 <= 0) start = 0
+    else if (currentPage + 5 > totalPages) start = totalPages - 10
+    else start = currentPage -4
+
+    let end
+    if (totalPages < 10) end = totalPages
+    else if (currentPage - 4 <= 0) end = 10
+    else if (currentPage + 5 > totalPages) end = totalPages
+    else end = currentPage + 5
 
     let a = []
     for (let i = start; i < end; i++) {
@@ -152,9 +153,7 @@ export default function MessageTable({page}) {
       <div className="header">
         <Row>
           <Col className="reload mutex">
-            <Button variant="outline-secondary" onClick={() =>
-              navigate(location.pathname)
-            }>
+            <Button variant="outline-secondary" onClick={() => navigate(location.pathname)}>
               <FontAwesomeIcon icon={faRotateRight}/> Reload
             </Button>
           </Col>
