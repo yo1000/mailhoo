@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import {Form, InputGroup} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
@@ -51,13 +51,15 @@ export default function SearchBox() {
 
   const navigate = useNavigate()
 
-  return (<Form css={style} onSubmit={(event) => {
+  const navigateToSearchResult = useCallback((event) => {
     event.preventDefault()
     const queryType = document.getElementById('queryType').value
     const queryValue = document.getElementById('queryValue').value
 
     navigate(`/search/${queryType}/${queryValue}`)
-  }}>
+  }, [])
+
+  return (<Form css={style} onSubmit={navigateToSearchResult}>
     <InputGroup className="mb-3">
       <Form.Select id="queryType">
         <option value="subject">Subject</option>

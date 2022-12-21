@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import {css} from "@emotion/react";
 import {Button, ButtonGroup, ButtonToolbar, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -148,12 +148,20 @@ export default function MessageTable({page}) {
   const location = useLocation()
   const basePath = location.pathname.replace(/\/[0-9]+$/, '')
 
+  const navigateForReload = useCallback(() => navigate(location.pathname), [])
+  const navigateToDetails = useCallback((event) => {
+    const messageId = event.currentTarget.dataset['messageid']
+    navigate(`../m/${messageId}`)
+  }, [])
+  const updatePaginatorStyleClass = useCallback(({isActive}) =>
+    `btn btn-outline-secondary ${isActive ? 'current' : ''}`, [])
+
   return (
     <div css={style}>
       <div className="header">
         <Row>
           <Col className="reload mutex">
-            <Button variant="outline-secondary" onClick={() => navigate(location.pathname)}>
+            <Button variant="outline-secondary" onClick={navigateForReload}>
               <FontAwesomeIcon icon={faRotateRight}/> Reload
             </Button>
           </Col>
@@ -165,27 +173,24 @@ export default function MessageTable({page}) {
                   {
                     (page.totalPages >= 14) && (page.number > 4) && (
                       <ButtonGroup className="me-2">
-                        <NavLink className={({isActive}) =>
-                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
-                        } to={`${basePath}/${0}`}>{1}</NavLink>
+                        <NavLink className={updatePaginatorStyleClass}
+                                 to={`${basePath}/${0}`}>{1}</NavLink>
                       </ButtonGroup>
                     )
                   }
                   <ButtonGroup className="me-2">
                     {
                       createPaginatorIndexes(page.number, page.totalPages).map((i) => (
-                        <NavLink key={`pageNumber-${i}`} className={({isActive}) =>
-                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
-                        } to={`${basePath}/${i}`}>{i + 1}</NavLink>
+                        <NavLink key={`pageNumber-${i}`} className={updatePaginatorStyleClass}
+                                 to={`${basePath}/${i}`}>{i + 1}</NavLink>
                       ))
                     }
                   </ButtonGroup>
                   {
                     (page.totalPages >= 14) && (page.number + 5 < page.totalPages) && (
                       <ButtonGroup className="me-2">
-                        <NavLink className={({isActive}) =>
-                          `btn btn-outline-secondary ${isActive ? 'current' : ''}`
-                        } to={`${basePath}/${page.totalPages - 1}`}>{page.totalPages}</NavLink>
+                        <NavLink className={updatePaginatorStyleClass}
+                                 to={`${basePath}/${page.totalPages - 1}`}>{page.totalPages}</NavLink>
                       </ButtonGroup>
                     )
                   }
@@ -215,9 +220,7 @@ export default function MessageTable({page}) {
         </Row>
         {
           page && page.content && page.content.map((m) => (
-            <Row key={`pageContent-${m.id}`} className="row" onClick={() =>
-              navigate(`../m/${m.id}`)
-            }>
+            <Row key={`pageContent-${m.id}`} data-messageid={m.id} className="row" onClick={navigateToDetails}>
               <Col className="email">
                 <ItemReceiver receivedTo={m.receivedTo} receivedCc={m.receivedCc} receivedBcc={m.receivedBcc}/>
               </Col>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import {css} from "@emotion/react";
 import {Button, ButtonGroup, Col, Row, ToggleButton} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -123,8 +123,11 @@ export default function MessageDetails({message}) {
   const navigate = useNavigate()
   const [getContentViewTypeValue, setContentViewTypeValue] = useState(CONTENT_VIEW_TYPES[0].value)
 
+  const navigateToBack = useCallback(() => navigate(-1), [])
+  const toggleContentView = useCallback((event) => setContentViewTypeValue(event.currentTarget.value), [])
+
   return (<>
-    <Button variant="outline-secondary" onClick={() => navigate(-1)}>
+    <Button variant="outline-secondary" onClick={navigateToBack}>
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
@@ -214,7 +217,7 @@ export default function MessageDetails({message}) {
             name="radio"
             value={contentViewType.value}
             checked={getContentViewTypeValue === contentViewType.value}
-            onChange={(event) => setContentViewTypeValue(event.target.value)}
+            onChange={toggleContentView}
           >
             {contentViewType.name}
           </ToggleButton>
