@@ -103,6 +103,9 @@ open http://localhost:8081
 | `SPRING_DATASOURCE_URL`            | JDBC Connection URL to database.                 |
 | `SPRING_DATASOURCE_USERNAME`       | Database Connection username.                    |
 | `SPRING_DATASOURCE_PASSWORD`       | Database Connection password.                    |
+| `SERVER_PORT`                      | API Server port. (default: `8080`)               |
+| `MAILHOO_SMTP_PORT`                | SMTP Server port. (default: `1025`)              |
+| `MAILHOO_WEB_ALLOWEDORIGINS`       | API Server allowed origin list.                  |
 | `MAILHOO_DATA_JPA_TABLENAMEPREFIX` | Prefix for naming of table that stores messages. |
 
 
