@@ -204,10 +204,10 @@ export default function MessageTable({page}) {
       <div className="messages">
         <Row className="row">
           <Col className="email">
-            Receiver
+            From
           </Col>
           <Col className="email">
-            Sender
+            To Cc Bcc
           </Col>
           <Col className="subject">
             Subject - Content
@@ -222,10 +222,10 @@ export default function MessageTable({page}) {
           page && page.content && page.content.map((m) => (
             <Row key={`pageContent-${m.id}`} data-messageid={m.id} className="row" onClick={navigateToDetails}>
               <Col className="email">
-                <ItemReceiver receivedTo={m.receivedTo} receivedCc={m.receivedCc} receivedBcc={m.receivedBcc}/>
+                <ItemSender sentFrom={m.sentFrom}/>
               </Col>
               <Col className="email">
-                <ItemSender sentFrom={m.sentFrom}/>
+                <ItemReceiver receivedTo={m.receivedTo} receivedCc={m.receivedCc} receivedBcc={m.receivedBcc}/>
               </Col>
               <Col className="subject">
                 <ItemSubjectContent subject={m.subject} plainContent={m.plainContent} htmlContent={m.htmlContent}/>
