@@ -136,33 +136,57 @@ class MessageRestController(
 
     @GetMapping("/search")
     fun getSearch(
-        @RequestParam("q")
-        q: String,
-        @RequestParam("f")
-        f: String,
         @RequestParam(
-            name = "prevSeq",
+            name = "subject",
             required = false,
         )
-        prevSeq: String?,
+        subject: String?,
         @RequestParam(
-            name = "nextSeq",
+            name = "content",
             required = false,
         )
-        nextSeq: String?,
-        seq: Long?,
+        content: String?,
+        @RequestParam(
+            name = "from",
+            required = false,
+        )
+        from: String?,
+        @RequestParam(
+            name = "to",
+            required = false,
+        )
+        to: String?,
+        @RequestParam(
+            name = "cc",
+            required = false,
+        )
+        cc: String?,
+        @RequestParam(
+            name = "bcc",
+            required = false,
+        )
+        bcc: String?,
+        @RequestParam(
+            name = "attachment",
+            required = false,
+        )
+        attachment: String?,
+        @PageableDefault(
+            size = 20,
+            page = 0,
+            sort = ["seq"],
+            direction = Sort.Direction.DESC,
+        )
         pageable: Pageable,
     ): Page<Message> {
-        if (q.isEmpty()) return Page.empty()
-
-        return when (f) {
-            "subject" -> messageSearchSubjectRepo.findAllByParam(q, pageable)
-            "content" -> messageSearchContentRepo.findAllByParam(q, pageable)
-            "from" -> messageSearchFromRepo.findAllByParam(q, pageable)
-            "to" -> messageSearchToRepo.findAllByParam(q, pageable)
-            "cc" -> messageSearchCcRepo.findAllByParam(q, pageable)
-            "bcc" -> messageSearchBccRepo.findAllByParam(q, pageable)
-            "attachment" -> messageSearchAttachmentRepo.findAllByParam(q, pageable)
+        return when {
+            subject != null -> messageSearchSubjectRepo.findAllByParam(subject, pageable)
+            content != null -> messageSearchContentRepo.findAllByParam(content, pageable)
+            from != null -> messageSearchFromRepo.findAllByParam(from, pageable)
+            to != null -> messageSearchToRepo.findAllByParam(to, pageable)
+            cc != null -> messageSearchCcRepo.findAllByParam(cc, pageable)
+            bcc != null -> messageSearchBccRepo.findAllByParam(bcc, pageable)
+            attachment != null -> messageSearchAttachmentRepo.findAllByParam(attachment, pageable)
             else -> messageRepos.findAll(pageable)
         }
     }

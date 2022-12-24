@@ -165,7 +165,7 @@ function QueriedMessageTable() {
       const API_BASE_URL = process.env.API_BASE_URL
       const pageQuery = !p && p !== '0' ? '' : `page=${p}`
 
-      await fetch(`${API_BASE_URL}/messages/search?f=${queryType}&q=${queryValue}&${pageQuery}`)
+      await fetch(`${API_BASE_URL}/messages/search?${queryType}=${queryValue}&${pageQuery}`)
         .then(resp => resp.json())
         .then(pageResp => {
           setPage(pageResp)
