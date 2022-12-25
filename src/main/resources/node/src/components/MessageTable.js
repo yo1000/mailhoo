@@ -62,7 +62,19 @@ export default function MessageTable({page}) {
         height: 2.5rem;
         margin: auto;
         border-bottom: 1px solid ${colors.backgroundActive};
-        
+
+        background: ${colors.backgroundSecondary};
+
+        &.unread {
+          background: ${colors.background};
+          font-weight: bold;
+        }
+
+        &:hover {
+          background: ${colors.backgroundActive};
+          cursor: pointer;
+        }
+
         &:first-child {
           margin-top: 2rem;
           height: 1.5rem;
@@ -70,14 +82,11 @@ export default function MessageTable({page}) {
           font-size: .75rem;
           font-weight: bold;          
           color: ${colors.foregroundSecondary};
+          background: ${colors.background};
+          cursor: auto;
 
           border-top: 1px solid ${colors.backgroundActive};
           border-bottom: 2px solid ${colors.backgroundActive};          
-        }
-        
-        &:hover {
-          background: ${colors.backgroundActive};
-          cursor: pointer;
         }
         
         .email,
@@ -202,7 +211,7 @@ export default function MessageTable({page}) {
       </div>
 
       <div className="messages">
-        <Row className="row">
+        <Row>
           <Col className="email">
             From
           </Col>
@@ -220,7 +229,7 @@ export default function MessageTable({page}) {
         </Row>
         {
           page && page.content && page.content.map((m) => (
-            <Row key={`pageContent-${m.id}`} data-messageid={m.id} className="row" onClick={navigateToDetails}>
+            <Row key={`pageContent-${m.id}`} data-messageid={m.id} className={m.unread && 'unread'} onClick={navigateToDetails}>
               <Col className="email">
                 <ItemSender sentFrom={m.sentFrom}/>
               </Col>

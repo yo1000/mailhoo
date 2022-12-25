@@ -98,6 +98,22 @@ class MessageRestController(
         }
     }
 
+    @PatchMapping("/{id}/unread")
+    fun patchUnreadById(
+        @PathVariable("id")
+        id: String,
+        @RequestBody
+        unread: Boolean
+    ) {
+        val message: Message = messageRepos.findById(id).orElseThrow {
+            throw NullPointerException("Missing message")
+        }
+
+        message.unread = unread
+
+        messageRepos.save(message)
+    }
+
     @GetMapping("/{id}/attachments/{fileName}",
         produces = [MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE],
         consumes = [

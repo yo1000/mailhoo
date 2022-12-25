@@ -192,6 +192,14 @@ function SelectedMessageDetails() {
         .then(messageResp => {
           setMessage(messageResp)
         })
+
+      await fetch(`${API_BASE_URL}/messages/${id}/unread`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": 'application/json'
+        },
+        body: 'false'
+      })
     }
 
     fetchMessage()

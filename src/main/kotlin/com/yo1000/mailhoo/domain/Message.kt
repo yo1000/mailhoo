@@ -53,5 +53,6 @@ data class Message(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     val raw: MessageRaw?,
+    var unread: Boolean?,
     val seq: Long
 )

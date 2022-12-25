@@ -155,6 +155,7 @@ class SmtpConfig(
                             ).let {
                                 messageRawRepos.save(it)
                             },
+                            unread = true,
                             seq = messageRepos.maxSeq()?.let { it + 1L } ?: 0
                         ).let {
                             messageRepos.save(it)
