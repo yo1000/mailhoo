@@ -105,9 +105,7 @@ class MessageRestController(
         @RequestBody
         unread: Boolean
     ) {
-        val message: Message = messageRepos.findById(id).orElseThrow {
-            throw NullPointerException("Missing message")
-        }
+        val message: Message = getById(id)
 
         message.unread = unread
 
@@ -129,9 +127,7 @@ class MessageRestController(
         @PathVariable("fileName")
         fileName: String,
     ): ResponseEntity<InputStreamResource> {
-        return messageRepos.findById(id).orElseThrow {
-            throw NullPointerException("Missing message")
-        }.attachments.find { it.fileName == fileName }?.let { attachment ->
+        return getById(id).attachments.find { it.fileName == fileName }?.let { attachment ->
             ByteArrayInputStream(messageRawRepos.findByMessageId(id).bytes).use {
                 MimeMessageParser(MimeMessage(
                     Session.getDefaultInstance(Properties()),
