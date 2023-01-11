@@ -10,7 +10,7 @@ import {useLocation, useNavigate} from "react-router-dom";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function DomainList() {
+export default function SideBar() {
   const style = css`
     .mutex.lock {
       cursor: not-allowed;

@@ -3,7 +3,7 @@ import {css} from "@emotion/react";
 import {Col, Row, Stack} from "react-bootstrap";
 import {MarkGithubIcon} from '@primer/octicons-react'
 
-import DomainList from "./DomainList";
+import SideBar from "./SideBar";
 import MessageTable from "./MessageTable"
 import MessageDetails from "./MessageDetails"
 import Logo from "./Logo"
@@ -66,7 +66,7 @@ export default function Mailbox() {
         <Col className="sidebar" sm={2}>
           <Logo/>
           <Routes>
-            <Route path="*" element={<DomainList/>}/>
+            <Route path="*" element={<SideBar/>}/>
           </Routes>
         </Col>
         <Col className="main-contents" sm={10}>
