@@ -85,19 +85,19 @@ export default function Mailbox() {
               <Col sm={12} className="messageTableContainer">
                 <Routes>
                   <Route path="/domains/:filterType/:filterValue">
-                    <Route path="p/:p" element={<FilteredMessageTable/>}/>
+                    <Route path="p/:p-:s" element={<FilteredMessageTable/>}/>
                     <Route path="m/:id" element={<SelectedMessageDetails/>}/>
-                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                    <Route path="" element={<Navigate to="p/0-20" replace/>}/>
                   </Route>
                   <Route path="/search/:queryType/:queryValue">
-                    <Route path="p/:p" element={<QueriedMessageTable/>}/>
+                    <Route path="p/:p-:s" element={<QueriedMessageTable/>}/>
                     <Route path="m/:id" element={<SelectedMessageDetails/>}/>
-                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                    <Route path="" element={<Navigate to="p/0-20" replace/>}/>
                   </Route>
                   <Route path="/">
-                    <Route path="p/:p" element={<InboxMessageTable/>}/>
+                    <Route path="p/:p-:s" element={<InboxMessageTable/>}/>
                     <Route path="m/:id" element={<SelectedMessageDetails/>}/>
-                    <Route path="" element={<Navigate to="p/0" replace/>}/>
+                    <Route path="" element={<Navigate to="p/0-20" replace/>}/>
                   </Route>
                 </Routes>
               </Col>
@@ -110,14 +110,14 @@ export default function Mailbox() {
 }
 
 function InboxMessageTable() {
-  const {p} = useParams()
+  const {p, s} = useParams()
   const location = useLocation()
   const [page, setPage] = useState()
 
   useEffect(() => {
     async function fetchPage() {
       const API_BASE_URL = process.env.API_BASE_URL
-      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}&size=${s}`
 
       await fetch(`${API_BASE_URL}/messages?all&${pageQuery}`)
         .then(resp => resp.json())
@@ -133,14 +133,14 @@ function InboxMessageTable() {
 }
 
 function FilteredMessageTable() {
-  const {filterType, filterValue, p} = useParams()
+  const {filterType, filterValue, p, s} = useParams()
   const location = useLocation()
   const [page, setPage] = useState()
 
   useEffect(() => {
     async function fetchPage() {
       const API_BASE_URL = process.env.API_BASE_URL
-      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}&size=${s}`
 
       await fetch(`${API_BASE_URL}/messages?${filterType}Domain=${filterValue}&${pageQuery}`)
         .then(resp => resp.json())
@@ -156,14 +156,14 @@ function FilteredMessageTable() {
 }
 
 function QueriedMessageTable() {
-  const {queryType, queryValue, p} = useParams()
+  const {queryType, queryValue, p, s} = useParams()
   const location = useLocation()
   const [page, setPage] = useState()
 
   useEffect(() => {
     async function fetchPage() {
       const API_BASE_URL = process.env.API_BASE_URL
-      const pageQuery = !p && p !== '0' ? '' : `page=${p}`
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}&size=${s}`
 
       await fetch(`${API_BASE_URL}/messages/search?${queryType}=${queryValue}&${pageQuery}`)
         .then(resp => resp.json())

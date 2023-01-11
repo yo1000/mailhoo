@@ -1,6 +1,6 @@
 import React, {useCallback} from "react";
 import {css} from "@emotion/react";
-import {Button, ButtonGroup, ButtonToolbar, Col, Row} from "react-bootstrap";
+import {Button, ButtonGroup, ButtonToolbar, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFile, faRotateRight} from '@fortawesome/free-solid-svg-icons'
 import dompurify from 'dompurify'
@@ -53,6 +53,10 @@ export default function MessageTable({page}) {
             background-color: ${colors.formControl.backgroundActive};
             border-color: ${colors.formControl.backgroundActive};
           }
+        }
+        
+        .form-select {
+          width: auto;
         }
       }
     }
@@ -155,9 +159,16 @@ export default function MessageTable({page}) {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const basePath = location.pathname.replace(/\/[0-9]+$/, '')
+  const basePath = location.pathname.replace(/\/[0-9\-]+$/, '')
+  const currentSize = location.pathname.match(/\/[0-9]+-([0-9]+)$/)[1]
 
-  const navigateForReload = useCallback(() => navigate(location.pathname), [])
+  const navigateForReload = useCallback(() => {
+    navigate(location.pathname)
+  }, [])
+  const navigateToChangedSize = useCallback((event) => {
+    const size = event.target.value
+    navigate(`${basePath}/0-${size}`)
+  }, [])
   const navigateToDetails = useCallback((event) => {
     const messageId = event.currentTarget.dataset['messageid']
     navigate(`../m/${messageId}`)
@@ -183,7 +194,7 @@ export default function MessageTable({page}) {
                     (page.totalPages >= 14) && (page.number > 4) && (
                       <ButtonGroup className="me-2">
                         <NavLink className={updatePaginatorStyleClass}
-                                 to={`${basePath}/${0}`}>{1}</NavLink>
+                                 to={`${basePath}/${0}-${currentSize}`}>{1}</NavLink>
                       </ButtonGroup>
                     )
                   }
@@ -191,7 +202,7 @@ export default function MessageTable({page}) {
                     {
                       createPaginatorIndexes(page.number, page.totalPages).map((i) => (
                         <NavLink key={`pageNumber-${i}`} className={updatePaginatorStyleClass}
-                                 to={`${basePath}/${i}`}>{i + 1}</NavLink>
+                                 to={`${basePath}/${i}-${currentSize}`}>{i + 1}</NavLink>
                       ))
                     }
                   </ButtonGroup>
@@ -199,10 +210,15 @@ export default function MessageTable({page}) {
                     (page.totalPages >= 14) && (page.number + 5 < page.totalPages) && (
                       <ButtonGroup className="me-2">
                         <NavLink className={updatePaginatorStyleClass}
-                                 to={`${basePath}/${page.totalPages - 1}`}>{page.totalPages}</NavLink>
+                                 to={`${basePath}/${page.totalPages - 1}-${currentSize}`}>{page.totalPages}</NavLink>
                       </ButtonGroup>
                     )
                   }
+                  <Form.Select id="pageSize" onChange={navigateToChangedSize} value={currentSize}>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </Form.Select>
                 </ButtonToolbar>
               ) : <></>
             }
