@@ -94,6 +94,11 @@ export default function Mailbox() {
                     <Route path="m/:id" element={<SelectedMessageDetails/>}/>
                     <Route path="" element={<Navigate to="p/0-20" replace/>}/>
                   </Route>
+                  <Route path="/unread">
+                    <Route path="p/:p-:s" element={<UnreadMessageTable/>}/>
+                    <Route path="m/:id" element={<SelectedMessageDetails/>}/>
+                    <Route path="" element={<Navigate to="p/0-20" replace/>}/>
+                  </Route>
                   <Route path="/">
                     <Route path="p/:p-:s" element={<InboxMessageTable/>}/>
                     <Route path="m/:id" element={<SelectedMessageDetails/>}/>
@@ -120,6 +125,29 @@ function InboxMessageTable() {
       const pageQuery = !p && p !== '0' ? '' : `page=${p}&size=${s}`
 
       await fetch(`${API_BASE_URL}/messages?all&${pageQuery}`)
+        .then(resp => resp.json())
+        .then(pageResp => {
+          setPage(pageResp)
+        })
+    }
+
+    fetchPage()
+  }, [location])
+
+  return <MessageTable page={page}/>
+}
+
+function UnreadMessageTable() {
+  const {p, s} = useParams()
+  const location = useLocation()
+  const [page, setPage] = useState()
+
+  useEffect(() => {
+    async function fetchPage() {
+      const API_BASE_URL = process.env.API_BASE_URL
+      const pageQuery = !p && p !== '0' ? '' : `page=${p}&size=${s}`
+
+      await fetch(`${API_BASE_URL}/messages?unread=true&${pageQuery}`)
         .then(resp => resp.json())
         .then(pageResp => {
           setPage(pageResp)

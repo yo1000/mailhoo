@@ -13,7 +13,8 @@ import javax.persistence.*
     indexes = [
         Index(name = "idx_Message_messageId", columnList = "messageId", unique = true),
         Index(name = "idx_Message_seq", columnList = "seq", unique = true),
-        Index(name = "idx_Message_receivedDate_desc", columnList = "receivedDate DESC")
+        Index(name = "idx_Message_receivedDate_desc", columnList = "receivedDate DESC"),
+        Index(name = "idx_Message_unread_receivedDate_desc", columnList = "unread, receivedDate DESC")
     ]
 )
 data class Message(

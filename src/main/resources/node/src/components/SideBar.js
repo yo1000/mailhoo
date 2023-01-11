@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {css} from "@emotion/react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faInbox, faAt} from '@fortawesome/free-solid-svg-icons'
+import {faInbox, faEnvelope, faAt} from '@fortawesome/free-solid-svg-icons'
 import colors from "../colors";
 import {useLocation, useNavigate} from "react-router-dom";
 
@@ -91,6 +91,12 @@ export default function SideBar() {
         }}>
           <FontAwesomeIcon icon={faInbox}/>
           Inbox
+        </li>
+        <li className={basePath === '/unread' ? 'current' : ''} onClick={(event) => {
+          navigate('/unread')
+        }}>
+          <FontAwesomeIcon icon={faEnvelope}/>
+          Unread
         </li>
       </ul>
       <h3>From</h3>

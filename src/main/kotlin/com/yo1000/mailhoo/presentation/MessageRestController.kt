@@ -27,6 +27,7 @@ import javax.mail.internet.MimeMessage
 @RequestMapping("/messages")
 class MessageRestController(
     private val messageRepos: MessageRepository,
+    private val messageUnreadRepos: MessageRepositoryForUnread,
     private val messageFromRepos: MessageRepositoryForSentFromDomain,
     private val messageToRepos: MessageRepositoryForReceivedToDomain,
     private val messageCcRepos: MessageRepositoryForReceivedCcDomain,
@@ -44,6 +45,11 @@ class MessageRestController(
 ) {
     @GetMapping
     fun get(
+        @RequestParam(
+            name = "unread",
+            required = false,
+        )
+        unread: Boolean?,
         @RequestParam(
             name = "fromDomain",
             required = false,
@@ -73,6 +79,7 @@ class MessageRestController(
         pageable: Pageable,
     ): Page<Message> {
         return when {
+            unread != null -> messageUnreadRepos.findAllByUnread(unread, pageable)
             fromDomainName != null -> messageFromRepos.findAllByParam(fromDomainName, pageable)
             toDomainName != null -> messageToRepos.findAllByParam(toDomainName, pageable)
             ccDomainName != null -> messageCcRepos.findAllByParam(ccDomainName, pageable)
