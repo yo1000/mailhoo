@@ -9,21 +9,45 @@ Mailhoo is a SMTP server for development inspired by [MailHog](https://github.co
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yo1000_mailhoo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yo1000_mailhoo)
 
+Quickstart
+----------
+
+```shell
+docker network create mailhoo
+
+docker run \
+  --net mailhoo \
+  --name mailhoo_container \
+  -p 8080:8080 \
+  -p 1025:1025 \
+  ghcr.io/yo1000/mailhoo
+```
+
+```shell
+open http://localhost:8080
+```
+
+```shell
+docker run \
+  -i \
+  --rm \
+  --net mailhoo \
+  dockette/mailx \
+  sh -c '
+    echo "Mailx test content" | mailx \
+    -s "Mailx test subject" \
+    -S smtp="mailhoo:1025" \
+    -S from="Mailx Sender<sender@mailx.localhost>" \
+    "Mailx Receiver<receiver@mailx.localhost>"
+  '
+```
+
 ![Mailbox1](docs/screenshot-mailbox1.png)
 
 ![Mailbox2](docs/screenshot-mailbox2.png)
 
 How to run
 ----------
-
-### Run with Docker image
-
-```shell
-docker run \
-  -p 8080:8080 \
-  -p 1025:1025 \
-  ghcr.io/yo1000/mailhoo
-```
 
 ### Run with Docker image and use an external database as a data store
 
@@ -59,7 +83,7 @@ The following other databases are available.
 ### Run with native image
 
 ```shell
-VERSION=1.3.0
+VERSION=1.3.1
 curl -L -o mailhoo "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-linux" && \
 chmod +x mailhoo
 ./mailhoo
@@ -70,7 +94,7 @@ chmod +x mailhoo
 See "Build Requirements" below for build requirements.
 
 ```shell
-VERSION=1.3.0
+VERSION=1.3.1
 curl -L -o mailhoo.jar "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-${VERSION}.jar" && \
 java -jar mailhoo.jar
 ```
