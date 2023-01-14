@@ -34,20 +34,6 @@ class WebConfig(
                             HttpMethod.DELETE.name)
                 }
             }
-
-            override fun addViewControllers(registry: ViewControllerRegistry) {
-                registry
-                    .addViewController("/")
-                    .setViewName("forward:/index.html")
-
-                registry
-                    .addViewController("/{spring:\\w+}")
-                    .setViewName("forward:/")
-
-                registry
-                    .addViewController("/**/{spring:\\w+}")
-                    .setViewName("forward:/")
-            }
         }
     }
 }
