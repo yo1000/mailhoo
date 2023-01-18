@@ -83,7 +83,7 @@ The following other databases are available.
 ### Run with native image
 
 ```shell
-VERSION=1.3.1
+VERSION=2.0.0
 curl -L -o mailhoo "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-linux" && \
 chmod +x mailhoo
 ./mailhoo
@@ -94,7 +94,7 @@ chmod +x mailhoo
 See "Build Requirements" below for build requirements.
 
 ```shell
-VERSION=1.3.1
+VERSION=2.0.0
 curl -L -o mailhoo.jar "https://github.com/yo1000/mailhoo/releases/download/${VERSION}/mailhoo-${VERSION}.jar" && \
 java -jar mailhoo.jar
 ```
@@ -142,13 +142,13 @@ When make a jar package.
 
 When make a GraalVM based native image.
 
-- GraalVM CE 22
+- GraalVM CE 22.3+
 
 ```shell
 java -version
-openjdk version "17.0.4" 2022-07-19
-OpenJDK Runtime Environment GraalVM CE 22.2.0 (build 17.0.4+8-jvmci-22.2-b06)
-OpenJDK 64-Bit Server VM GraalVM CE 22.2.0 (build 17.0.4+8-jvmci-22.2-b06, mixed mode, sharing)
+openjdk version "19.0.1" 2022-10-18
+OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 19.0.1+10-jvmci-22.3-b08)
+OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 19.0.1+10-jvmci-22.3-b08, mixed mode, sharing)
 ```
 
 
@@ -164,5 +164,5 @@ for Java ARchive (jar).
 for GraalVM based native binary.
 
 ```shell
-./mvnw clean package -Pnative
+./mvnw clean package -Pnative -DskipNativeTests
 ```
