@@ -1,8 +1,8 @@
 package com.yo1000.mailhoo.domain
 
-import org.hibernate.annotations.Type
+import jakarta.persistence.*
+import org.hibernate.Length
 import java.util.*
-import javax.persistence.*
 
 /**
  *
@@ -34,22 +34,18 @@ data class Message(
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
     var receivedBcc: Set<ReceivedBcc>,
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(length = Length.LONG32)
     val subject: String?,
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(length = Length.LONG32)
     val plainContent: String?,
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(length = Length.LONG32)
     val htmlContent: String?,
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
     val attachments: Set<Attachment>,
     val sentDate: Date,
     val receivedDate: Date,
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(length = Length.LONG32)
     val headers: String,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn

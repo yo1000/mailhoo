@@ -1,7 +1,7 @@
 package com.yo1000.mailhoo.domain
 
+import jakarta.persistence.*
 import java.util.*
-import javax.persistence.*
 
 /**
  *

@@ -1,7 +1,9 @@
 package com.yo1000.mailhoo.presentation
 
 import com.yo1000.mailhoo.domain.*
-import org.apache.commons.mail.util.MimeMessageParser
+import jakarta.mail.Session
+import jakarta.mail.internet.MimeMessage
+import org.simplejavamail.converter.internal.mimemessage.MimeMessageParser
 import org.springframework.core.io.InputStreamResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriUtils
 import java.io.ByteArrayInputStream
 import java.util.*
-import javax.mail.Session
-import javax.mail.internet.MimeMessage
 
 /**
  *
@@ -136,18 +136,15 @@ class MessageRestController(
     ): ResponseEntity<InputStreamResource> {
         return getById(id).attachments.find { it.fileName == fileName }?.let { attachment ->
             ByteArrayInputStream(messageRawRepos.findByMessageId(id).bytes).use {
-                MimeMessageParser(MimeMessage(
+                MimeMessageParser.parseMimeMessage(MimeMessage(
                     Session.getDefaultInstance(Properties()),
                     it
-                )).also {
-                    it.parse()
-                }.findAttachmentByName(attachment.fileName)?.let {
+                )).attachmentList.find { it.name == attachment.fileName }?.let {
                     ResponseEntity
                         .ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, """attachment; filename="${UriUtils.encode(fileName, Charsets.UTF_8)}" """)
-                        .contentType(MediaType.parseMediaType(it.contentType))
-                        .body(InputStreamResource(it.inputStream))
-
+                        .contentType(MediaType.parseMediaType(it.dataSource.contentType))
+                        .body(InputStreamResource(it.dataSource.inputStream))
                 }
             }
         } ?: throw NullPointerException("Missing attachment")

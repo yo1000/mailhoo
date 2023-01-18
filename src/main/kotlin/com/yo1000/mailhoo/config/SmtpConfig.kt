@@ -1,25 +1,25 @@
-package com.yo1000.mailhoo
+package com.yo1000.mailhoo.config
 
 import com.yo1000.mailhoo.domain.*
+import jakarta.mail.Header
+import jakarta.mail.Session
+import jakarta.mail.internet.*
 import org.apache.commons.codec.net.QuotedPrintableCodec
-import org.apache.commons.mail.util.MimeMessageParser
+import org.simplejavamail.converter.internal.mimemessage.MimeMessageParser
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.ExampleMatcher
-import org.subethamail.wiser.Wiser
+import org.subethamail.smtp.server.SMTPServer
 import org.subethamail.wiser.WiserMessage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
-import javax.mail.Header
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeMessage
 
-typealias RecipientType = javax.mail.Message.RecipientType
+typealias RecipientType = jakarta.mail.Message.RecipientType
 
 /**
  *
@@ -46,7 +46,7 @@ class SmtpConfig(
     }
 
     @Bean
-    fun wiser(
+    fun smtpServer(
         messageRepos: MessageRepository,
         messageRawRepos: MessageRawRepository,
         sentFromRepos: SentFromRepository,
@@ -56,47 +56,48 @@ class SmtpConfig(
         addressRepos: AddressRepository,
         attachmentRepos: AttachmentRepository,
         receivedBccAggregator: ReceivedBccAggregator,
-    ): Wiser {
-        return object : Wiser(props.port ?: throw NullPointerException("SMTP Port is null")) {
-            init {
-                receivedBccAggregator.start()
-            }
+    ): SMTPServer {
+        receivedBccAggregator.start()
 
-            override fun deliver(from: String?, recipient: String?, data: InputStream?) {
-                super.deliver(from, recipient, data)
+        return SMTPServer
+            .port(props.port ?: throw NullPointerException("SMTP Port is null"))
+            .messageHandler { context, senderEmail, receiverEmail, data ->
+                val mimeMessage: MimeMessage = MimeMessage(
+                    Session.getDefaultInstance(Properties()),
+                    ByteArrayInputStream(data))
 
-                val wiserMessage: WiserMessage = messages.last()
-                val mimeMessage: MimeMessage = wiserMessage.mimeMessage
-
-                fun AddressRepository.findOrSave(address: Address): Address {
-                    return findOne(Example.of(
-                        address,
-                        ExampleMatcher.matching().withIgnorePaths(
-                            Address::id.name,
-                            Address::domain.name
-                        )
-                    )).orElseGet { save(address) }
-                }
-
-                if (recipient != null) {
-                    receivedBccAggregator.addAddress(mimeMessage.messageID, recipient)
+                if (receiverEmail != null) {
+                    receivedBccAggregator.addAddress(mimeMessage.messageID, receiverEmail)
                 }
 
                 if (!messageRepos.existsByMessageId(mimeMessage.messageID)) {
                     ByteArrayOutputStream().use {
                         mimeMessage.writeTo(it)
 
-                        val messageParser: MimeMessageParser = MimeMessageParser(mimeMessage).also {
-                            it.parse()
+                        val mimeComponents: MimeMessageParser.ParsedMimeMessageComponents =
+                            MimeMessageParser.parseMimeMessage(mimeMessage)
+
+                        fun AddressRepository.findOrSave(address: Address): Address {
+                            return findOne(
+                                Example.of(
+                                    address,
+                                    ExampleMatcher.matching().withIgnorePaths(
+                                        Address::id.name,
+                                        Address::domain.name
+                                    )
+                                )
+                            ).orElseGet { save(address) }
                         }
 
                         Message(
                             messageId = mimeMessage.messageID,
                             sentFrom = setOf(SentFrom(
-                                address = addressRepos.findOrSave(Address(
-                                    displayName = wiserMessage.findDisplayName(true),
-                                    email = wiserMessage.envelopeSender,
-                                )),
+                                address = addressRepos.findOrSave(
+                                    Address(
+                                        displayName = mimeMessage.getSenderDisplayName(senderEmail),
+                                        email = senderEmail,
+                                    )
+                                ),
                             ).let {
                                 sentFromRepos.save(it)
                             }),
@@ -104,10 +105,12 @@ class SmtpConfig(
                                 ?.filterIsInstance<InternetAddress>()
                                 ?.map {
                                     ReceivedTo(
-                                        address = addressRepos.findOrSave(Address(
-                                            displayName = it.personal,
-                                            email = it.address,
-                                        )),
+                                        address = addressRepos.findOrSave(
+                                            Address(
+                                                displayName = it.personal,
+                                                email = it.address,
+                                            )
+                                        ),
                                     ).let {
                                         receivedToRepos.save(it)
                                     }
@@ -116,10 +119,12 @@ class SmtpConfig(
                                 ?.filterIsInstance<InternetAddress>()
                                 ?.map {
                                     ReceivedCc(
-                                        address = addressRepos.findOrSave(Address(
-                                            displayName = it.personal,
-                                            email = it.address,
-                                        )),
+                                        address = addressRepos.findOrSave(
+                                            Address(
+                                                displayName = it.personal,
+                                                email = it.address,
+                                            )
+                                        ),
                                     ).let {
                                         receivedCcRepos.save(it)
                                     }
@@ -128,20 +133,22 @@ class SmtpConfig(
                                 ?.filterIsInstance<InternetAddress>()
                                 ?.map {
                                     ReceivedBcc(
-                                        address = addressRepos.findOrSave(Address(
-                                            displayName = it.personal,
-                                            email = it.address,
-                                        )),
+                                        address = addressRepos.findOrSave(
+                                            Address(
+                                                displayName = it.personal,
+                                                email = it.address,
+                                            )
+                                        ),
                                     ).let {
                                         receivedBccRepos.save(it)
                                     }
                                 }?.toSet() ?: emptySet(),
                             subject = mimeMessage.subject,
-                            plainContent = messageParser.plainContent,
-                            htmlContent = messageParser.htmlContent,
-                            attachments = messageParser.attachmentList.map {
+                            plainContent = mimeComponents.plainContent,
+                            htmlContent = mimeComponents.htmlContent,
+                            attachments = mimeComponents.attachmentList.map {
                                 Attachment(
-                                    contentType = it.contentType,
+                                    contentType = it.dataSource.contentType,
                                     fileName = it.name,
                                 ).let {
                                     attachmentRepos.save(it)
@@ -163,9 +170,44 @@ class SmtpConfig(
                     }
                 }
             }
-        }.also {
-            it.start()
-        }
+            .build()
+            .also {
+                it.start()
+            }
+    }
+
+    private fun MimeMessage.getSenderDisplayName(senderEmail: String): String? {
+        return getDisplayName(senderEmail, listOf("From"))
+    }
+
+    private fun MimeMessage.getReceiverDisplayName(receiverEmail: String): String? {
+        return getDisplayName(receiverEmail, listOf("To", "Cc", "Bcc"))
+    }
+
+    private fun MimeMessage.getDisplayName(email: String, headerNames: List<String>): String? {
+        return allHeaders
+            .toList()
+            .filterIsInstance<Header>()
+            .filter {
+                headerNames.any { name -> it.name.equals(name, true) }
+            }
+            .map { it.value }
+            .flatMap { it.split(Regex("\\s*,\\s*")) }
+            .filter { it.contains("<${email}>", true) }
+            .map {
+                val result: MatchResult? = Regex("^=\\?([^?]+)\\?([QqBb])\\?(.*)\\?=").find(it)
+
+                val encode: String? = result?.groupValues?.get(1)
+                val encodeType: String? = result?.groupValues?.get(2)
+                val encodedValue: String? = result?.groupValues?.get(3)
+
+                when (encodeType?.uppercase()) {
+                    "B" -> String(Base64.getDecoder().decode(encodedValue), Charset.forName(encode))
+                    "Q" -> QuotedPrintableCodec(encode).decode(encodedValue)
+                    else -> it.replace(Regex("\\s*<\\Q${email}\\E>"), "").trim()
+                }
+            }
+            .firstOrNull()
     }
 
     private fun WiserMessage.findDisplayName(isSender: Boolean): String? {

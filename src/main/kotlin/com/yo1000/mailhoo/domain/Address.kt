@@ -1,10 +1,10 @@
 package com.yo1000.mailhoo.domain
 
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.Table
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Index
-import javax.persistence.Table
 
 /**
  *
