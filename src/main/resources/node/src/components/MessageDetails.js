@@ -15,7 +15,7 @@ import {useNavigate} from "react-router-dom";
  * @constructor
  */
 export default function MessageDetails({message}) {
-  const style = css`
+  const headerStyle = css`
     h2 {
       font-size: 1.5rem;
       font-weight: 400;
@@ -103,6 +103,11 @@ export default function MessageDetails({message}) {
     }
   `
 
+  const contentStyle = css`
+    max-width: 100%;
+    overflow: auto;
+  `
+
   const styleHeaders = css`
     color: ${colors.foreground};
   `
@@ -131,7 +136,7 @@ export default function MessageDetails({message}) {
       <FontAwesomeIcon icon={faArrowLeft}/> Back
     </Button>
 
-    <div css={style}>
+    <div css={headerStyle}>
       <h2>{message && message.subject}</h2>
       <Row>
         <Col sm={8}>
@@ -224,7 +229,7 @@ export default function MessageDetails({message}) {
         ))}
       </ButtonGroup>
     </div>
-    <div>
+    <div css={contentStyle}>
     { (() => {
       switch (getContentViewTypeValue) {
         case CONTENT_VIEW_TYPES[CONTENT_VIEW_TYPE_INDEXES.HTML].value:
