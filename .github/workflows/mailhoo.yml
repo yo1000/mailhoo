@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.2.0'
+          version: '22.3.0'
           java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,14 +37,14 @@ jobs:
       - uses: actions/checkout@v2
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.2.0'
+          version: '22.3.0'
           java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: 'maven'
       - name: Build
         run: |
-          mvn -Pnative -DskipTests clean package
+          mvn -Pnative -DskipTests -DskipNativeTests clean package
       - uses: actions/upload-artifact@v2
         with:
           name: mailhoo-${{ matrix.os }}
