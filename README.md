@@ -59,8 +59,10 @@ docker run \
   --name mailhoo_database \
   --env POSTGRES_DB=mailhoo \
   --env POSTGRES_PASSWORD=postgres \
-  postgres &
+  postgres
+```
 
+```shell
 docker run \
   --net mailhoo \
   -p 8080:8080 \
@@ -109,14 +111,18 @@ See "Build Requirements" below for build requirements.
   -Dspring.h2.console.enabled=true
   -Dserver.error.whitelabel.enabled=true
   -Dmailhoo.web.allowed-origins=http://localhost:8081
-" &
+"
+```
 
+```shell
 cd src/main/resources/node
 NODE_ENV=development \
 PORT=8081 \
 API_BASE_URL=http://localhost:8080 \
-npx webpack serve &
+npx webpack serve
+```
 
+```shell
 open http://localhost:8081
 ```
 
