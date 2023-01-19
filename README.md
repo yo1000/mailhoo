@@ -36,7 +36,7 @@ docker run \
   sh -c '
     echo "Mailx test content" | mailx \
     -s "Mailx test subject" \
-    -S smtp="mailhoo:1025" \
+    -S smtp="mailhoo_container:1025" \
     -S from="Mailx Sender<sender@mailx.localhost>" \
     "Mailx Receiver<receiver@mailx.localhost>"
   '
